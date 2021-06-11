@@ -11,8 +11,8 @@ public class Function extends IdentifierWithArguments {
 
     private final String typeReturn;
 
-    public Function(String name, String typeReturn, List<Entry<String, String>> args) {
-        super(name, args);
+    public Function(String identifier, String typeReturn, List<Entry<String, String>> args) {
+        super(args, identifier);
         this.typeReturn = typeReturn;
     }
 

@@ -9,8 +9,8 @@ import java.util.Map.Entry;
  */
 public class Procedure extends IdentifierWithArguments {
 
-    public Procedure(String string, List<Entry<String, String>> args) {
-        super(string, args);
+    public Procedure(String identifier, List<Entry<String, String>> args) {
+        super(args, identifier);
     }
 
     @Override
