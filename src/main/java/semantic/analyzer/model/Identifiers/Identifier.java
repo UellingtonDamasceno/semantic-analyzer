@@ -7,15 +7,15 @@ package semantic.analyzer.model.Identifiers;
 public abstract class Identifier {
 
     protected String name;
-    
-    public Identifier(String name){
+
+    public Identifier(String name) {
         this.name = name;
     }
-    
-    public final String getName(){
+
+    public final String getName() {
         return this.name;
     }
-    
+
     @Override
     public abstract boolean equals(Object obj);
 

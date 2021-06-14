@@ -1,7 +1,7 @@
 package semantic.analyzer.model.Identifiers;
 
 /**
- *
+ * 
  * @author Antonio Neto e Uellington Damasceno
  */
 public class SimpleIdentifier extends Identifier {
@@ -26,6 +26,10 @@ public class SimpleIdentifier extends Identifier {
 
     public boolean isGlobal() {
         return global;
+    }
+
+    public boolean thisTypeIs(String type) {
+        return this.type.equals(type);
     }
 
     @Override

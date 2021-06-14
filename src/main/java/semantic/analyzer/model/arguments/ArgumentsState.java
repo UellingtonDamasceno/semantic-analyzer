@@ -10,6 +10,6 @@ import java.util.Map.Entry;
 public interface ArgumentsState<T> {
     public int size();
     public T get(int index);
-    public boolean isValid();
+    public boolean hasRepeatedArguments();
     public ArgumentsState<T> changeState(List<Entry<T, T>> args);
 }

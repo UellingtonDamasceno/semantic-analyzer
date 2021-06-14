@@ -31,8 +31,8 @@ public class ArgumentsSignature implements ArgumentsState<String> {
     }
 
     @Override
-    public boolean isValid() {
-        return true;
+    public boolean hasRepeatedArguments() {
+        return false;
     }
 
     //TODO factory

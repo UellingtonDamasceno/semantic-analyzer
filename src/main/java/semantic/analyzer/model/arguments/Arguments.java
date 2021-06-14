@@ -28,7 +28,7 @@ public class Arguments implements ArgumentsState<String> {
     }
 
     @Override
-    public boolean isValid() {
+    public boolean hasRepeatedArguments() {
         return arguments.stream()
                 .map(Entry::getValue)
                 .collect(toSet())
