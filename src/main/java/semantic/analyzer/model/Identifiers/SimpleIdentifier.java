@@ -10,16 +10,16 @@ public class SimpleIdentifier extends Identifier {
 
     private boolean variable;
     private boolean inicialized;
-    private boolean global;
     private String type;
 
-    public SimpleIdentifier(Token type, Token name) {
-        this(type.getLexame().getLexame(), type.getLexame().getLexame());
+    public SimpleIdentifier(Token type, Token name, boolean isVariable) {
+        this(type.getLexame().getLexame(), name.getLexame().getLexame(), isVariable);
     }
 
-    public SimpleIdentifier(String type, String name) {
+    public SimpleIdentifier(String type, String name, boolean isVariable) {
         super(name);
         this.type = type;
+        this.variable = isVariable;
     }
 
     public boolean isInicialized() {
@@ -30,8 +30,8 @@ public class SimpleIdentifier extends Identifier {
         this.inicialized = true;
     }
 
-    public boolean isGlobal() {
-        return global;
+    public boolean isVariable() {
+        return variable;
     }
 
     public boolean thisTypeIs(String type) {
@@ -46,11 +46,22 @@ public class SimpleIdentifier extends Identifier {
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 47 * hash + (this.variable ? 1 : 0);
-        hash = 47 * hash + (this.global ? 1 : 0);
         hash = 47 * hash + this.type.hashCode();
         hash = 47 * hash + this.name.hashCode();
         return hash;
+    }
+
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append("{")
+                .append("type:")
+                .append(type)
+                .append(",")
+                .append("name:")
+                .append(name)
+                .append("}")
+                .toString();
     }
 
 }

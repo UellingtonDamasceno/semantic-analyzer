@@ -2,9 +2,7 @@ package semantic.analyzer.model;
 
 import java.util.HashMap;
 import java.util.Map;
-import lexical.analyzer.model.Token;
 import semantic.analyzer.model.Identifiers.Identifier;
-import semantic.analyzer.model.Identifiers.SimpleIdentifier;
 import semantic.analyzer.model.exceptions.SymbolAlreadyDeclaredException;
 import semantic.analyzer.model.exceptions.UndeclaredSymbolException;
 
@@ -27,14 +25,14 @@ public class SymTable {
     }
 
     public void insert(Identifier id) throws SymbolAlreadyDeclaredException {
-        String identifier = id.getName();
+        String name = id.getName();
         try {
-            Identifier found = this.find(identifier, this);
+            Identifier found = this.find(name, this);
             if (found.equals(id)) {
                 throw new SymbolAlreadyDeclaredException();
             }
         } catch (UndeclaredSymbolException ex) {
-            this.table.put(identifier, id);
+            this.table.put(name, id);
         }
     }
 
@@ -55,6 +53,7 @@ public class SymTable {
         if (current == null) {
             throw new UndeclaredSymbolException();
         }
-        return current.table.getOrDefault(identifier, find(identifier, current.prev));
+        Identifier id = current.table.get(identifier);
+        return id != null ? id : find(identifier, current.prev);
     }
 }
