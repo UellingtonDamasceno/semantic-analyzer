@@ -1,7 +1,9 @@
 package semantic.analyzer.model.Identifiers;
 
+import lexical.analyzer.model.Token;
+
 /**
- * 
+ *
  * @author Antonio Neto e Uellington Damasceno
  */
 public class SimpleIdentifier extends Identifier {
@@ -10,6 +12,10 @@ public class SimpleIdentifier extends Identifier {
     private boolean inicialized;
     private boolean global;
     private String type;
+
+    public SimpleIdentifier(Token type, Token name) {
+        this(type.getLexame().getLexame(), type.getLexame().getLexame());
+    }
 
     public SimpleIdentifier(String type, String name) {
         super(name);

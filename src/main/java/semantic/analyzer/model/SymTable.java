@@ -2,6 +2,9 @@ package semantic.analyzer.model;
 
 import java.util.HashMap;
 import java.util.Map;
+import lexical.analyzer.model.Token;
+import semantic.analyzer.model.Identifiers.Identifier;
+import semantic.analyzer.model.Identifiers.SimpleIdentifier;
 import semantic.analyzer.model.exceptions.SymbolAlreadyDeclaredException;
 import semantic.analyzer.model.exceptions.UndeclaredSymbolException;
 
@@ -11,7 +14,7 @@ import semantic.analyzer.model.exceptions.UndeclaredSymbolException;
  */
 public class SymTable {
 
-    private Map<String, Symbol> table;
+    private Map<String, Identifier> table;
     private SymTable prev;
 
     public SymTable() {
@@ -23,14 +26,15 @@ public class SymTable {
         this.prev = parent;
     }
 
-    public void insert(String identifier, Symbol symbol) throws SymbolAlreadyDeclaredException {
+    public void insert(Identifier id) throws SymbolAlreadyDeclaredException {
+        String identifier = id.getName();
         try {
-            Symbol found = this.find(identifier, this);
-            if (found.equals(symbol)) {
+            Identifier found = this.find(identifier, this);
+            if (found.equals(id)) {
                 throw new SymbolAlreadyDeclaredException();
             }
         } catch (UndeclaredSymbolException ex) {
-            this.table.put(identifier, symbol);
+            this.table.put(identifier, id);
         }
     }
 
@@ -43,11 +47,11 @@ public class SymTable {
         }
     }
 
-    public Symbol find(String identifier) throws UndeclaredSymbolException {
+    public Identifier find(String identifier) throws UndeclaredSymbolException {
         return find(identifier, this);
     }
 
-    private Symbol find(String identifier, SymTable current) throws UndeclaredSymbolException {
+    private Identifier find(String identifier, SymTable current) throws UndeclaredSymbolException {
         if (current == null) {
             throw new UndeclaredSymbolException();
         }
