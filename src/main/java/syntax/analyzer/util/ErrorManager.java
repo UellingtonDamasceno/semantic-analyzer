@@ -22,6 +22,7 @@ public class ErrorManager {
     private static List<Exception> semanticalErrors = new LinkedList();
     private static List<String> unexpectedToken = new LinkedList();
     private static EOFNotExpectedException E;
+    public static boolean CAN_ADD = true;
 
     public static void genericBlockConsumer(Deque<Token> tokens) throws EOFNotExpectedException {
         TokenUtil.consumer(tokens);
@@ -57,11 +58,15 @@ public class ErrorManager {
     }
 
     public static void addNewSyntaticalError(Deque<Token> tokens, Terminals... terminals) {
-        syntaticalErrors.add(new SyntaxErrorException(tokens.peek().getLexame(), terminals));
+        if (CAN_ADD) {
+            syntaticalErrors.add(new SyntaxErrorException(tokens.peek().getLexame(), terminals));
+        }
     }
 
     public static void addNewSyntaticalError(SyntaxErrorException e) {
-        syntaticalErrors.add(e);
+        if (CAN_ADD) {
+            syntaticalErrors.add(e);
+        }
     }
 
     public static List<String> getErrors(boolean showUnexpectedTokens, boolean showSyntaticalErrors) {
@@ -73,11 +78,11 @@ public class ErrorManager {
                     .map(SyntaticalError::toString)
                     .collect(toList());
         }
-        
+
         lines.addAll(semanticalErrors.stream()
                 .map(Exception::getMessage)
                 .collect(toList()));
-        
+
         if (showUnexpectedTokens && !unexpectedToken.isEmpty()) {
             lines.addAll(unexpectedToken);
         }
@@ -100,6 +105,8 @@ public class ErrorManager {
     }
 
     public static void addNewSemanticalError(Exception e) {
-        semanticalErrors.add(e);
+        if (CAN_ADD) {
+            semanticalErrors.add(e);
+        }
     }
 }

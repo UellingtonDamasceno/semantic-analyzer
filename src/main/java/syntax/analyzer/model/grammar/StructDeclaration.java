@@ -3,8 +3,6 @@ package syntax.analyzer.model.grammar;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import lexical.analyzer.enums.TokenType;
 import lexical.analyzer.model.Token;
 import semantic.analyzer.model.Identifiers.ComplexIdentifier;
@@ -58,8 +56,8 @@ public class StructDeclaration {
                     loadInhereted.addAll(ComplexIdentifier.loadInhereted(Program.GLOBAL_SCOPE, inhereted.getLexame().getLexame().hashCode()));
                     struct = new ComplexIdentifier(name, table, loadInhereted);
                 } catch (UndeclaredSymbolException ex) {
-                    ex.setLine(token.getLexame().getLine());
-                    ex.setName(name);
+                    ex.setLine(inhereted.getLexame().getLine());
+                    ex.setName(inhereted.getLexame().getLexame());
                     ErrorManager.addNewSemanticalError(ex);
                 }
             }

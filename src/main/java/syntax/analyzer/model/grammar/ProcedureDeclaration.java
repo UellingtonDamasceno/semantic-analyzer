@@ -45,6 +45,6 @@ public class ProcedureDeclaration {
         } catch (SymbolAlreadyDeclaredException ex) {
             ErrorManager.addNewSemanticalError(ex);
         }
-        StatementDeclaration.fullChecker(tokens);
+//        StatementDeclaration.fullChecker(tokens);
     }
 }
