@@ -1,6 +1,7 @@
 package semantic.analyzer.model.Identifiers;
 
 import java.util.List;
+import lexical.analyzer.model.Token;
 import semantic.analyzer.model.SymTable;
 import semantic.analyzer.model.exceptions.UndeclaredSymbolException;
 
@@ -25,7 +26,6 @@ public class ComplexIdentifier extends Identifier {
         super(name);
         this.symTable = symTable;
         this.inhetedTypes = inhetedTypes;
-        System.out.println(inhetedTypes);
     }
 
     public boolean hasParent() {
@@ -35,10 +35,22 @@ public class ComplexIdentifier extends Identifier {
     public boolean isInstance(String parentType) {
         return inhetedTypes.contains(parentType);
     }
+    
+    public String getType(){
+        return this.inhetedTypes.get(0);
+    }
+    
+    public SymTable getSymTable(){
+        return this.symTable;
+    }
+    
+    public List<String> getInhetedTypes(){
+        return this.inhetedTypes;
+    }
 
-    public static List<String> loadInhereted(SymTable table, Integer parent) throws UndeclaredSymbolException {
+    public static ComplexIdentifier loadInhereted(SymTable table, Token parent) throws UndeclaredSymbolException {
         ComplexIdentifier struct = (ComplexIdentifier) table.find(parent);
-        return struct.inhetedTypes;
+        return struct;
     }
 
     @Override

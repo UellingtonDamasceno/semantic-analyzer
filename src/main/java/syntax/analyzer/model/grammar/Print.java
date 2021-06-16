@@ -3,6 +3,9 @@ package syntax.analyzer.model.grammar;
 import java.util.Deque;
 import lexical.analyzer.enums.TokenType;
 import lexical.analyzer.model.Token;
+import semantic.analyzer.model.Identifiers.ComplexIdentifier;
+import semantic.analyzer.model.SymTable;
+import semantic.analyzer.model.exceptions.UndeclaredSymbolException;
 import syntax.analyzer.model.exceptions.EOFNotExpectedException;
 import syntax.analyzer.model.exceptions.SyntaxErrorException;
 import syntax.analyzer.util.ErrorManager;
@@ -16,7 +19,10 @@ import syntax.analyzer.util.TokenUtil;
  */
 public class Print {
 
-    public static void fullChecker(Deque<Token> tokens) throws EOFNotExpectedException {
+    private static SymTable currentScope;
+
+    public static void fullChecker(Deque<Token> tokens, SymTable parent) throws EOFNotExpectedException {
+        Print.currentScope = parent;
         TokenUtil.consumer(tokens);
         TokenUtil.consumeExpectedTokenByLexame(tokens, OPEN_PARENTHESES);
         if (TokenUtil.testLexameBeforeConsume(tokens, CLOSE_PARENTHESES)) {
@@ -37,12 +43,20 @@ public class Print {
             if (TokenUtil.testTypeBeforeConsume(tokens, TokenType.STRING, Terminals.STRING)) {
                 TokenUtil.consumer(tokens);
             } else if (TokenUtil.testTypeBeforeConsume(tokens, TokenType.IDENTIFIER, Terminals.IDENTIFIER)) {
+                Token id = tokens.peek();
                 TokenUtil.consumer(tokens);
                 if (!TokenUtil.testLexameBeforeConsume(tokens, COMMA)
                         && !TokenUtil.testLexameBeforeConsume(tokens, CLOSE_PARENTHESES)
                         && !TokenUtil.testLexameBeforeConsume(tokens, SEMICOLON)) {
                     if (TokenUtil.testLexameBeforeConsume(tokens, DOT)) {
-                        StructDeclaration.structUsageConsumer(tokens);
+                        try {
+                            var found = (ComplexIdentifier) Program.GLOBAL_SCOPE.find(id);
+                            StructDeclaration.structUsageConsumer(tokens, found.getSymTable());
+                        } catch (UndeclaredSymbolException ex) {
+                            ex.setInfo(id);
+                            ErrorManager.addNewSemanticalError(ex);
+                            StructDeclaration.structUsageConsumer(tokens);
+                        }
                     } else if (TokenUtil.testLexameBeforeConsume(tokens, OPEN_BRACKET)) {
                         Arrays.dimensionConsumer(tokens);
                     } else {

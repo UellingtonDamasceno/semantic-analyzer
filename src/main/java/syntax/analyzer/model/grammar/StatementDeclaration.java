@@ -1,13 +1,9 @@
 package syntax.analyzer.model.grammar;
 
 import java.util.Deque;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import lexical.analyzer.enums.TokenType;
 import lexical.analyzer.model.Token;
-import semantic.analyzer.model.Identifiers.Identifier;
 import semantic.analyzer.model.SymTable;
-import semantic.analyzer.model.exceptions.UndeclaredSymbolException;
 import syntax.analyzer.model.exceptions.EOFNotExpectedException;
 import syntax.analyzer.model.exceptions.SyntaxErrorException;
 import syntax.analyzer.util.ErrorManager;
@@ -56,7 +52,7 @@ public class StatementDeclaration {
                 Read.fullChecker(tokens);
                 TokenUtil.consumeExpectedTokenByLexame(tokens, SEMICOLON);
             } else if (token.thisLexameIs(PRINT.getVALUE())) {
-                Print.fullChecker(tokens);
+                Print.fullChecker(tokens, parentTable);
                 TokenUtil.consumeExpectedTokenByLexame(tokens, SEMICOLON);
             } else if (token.thisLexameIs(VAR.getVALUE())) {
                 VarDeclaration.fullChecker(tokens, parentTable);
@@ -71,7 +67,7 @@ public class StatementDeclaration {
             } else if (token.thisLexameIs(TYPEDEF.getVALUE())) {
                 StructDeclaration.fullChecker(tokens);
             } else if (token.thisLexameIs(GLOBAL.getVALUE()) || token.thisLexameIs(LOCAL.getVALUE())) {
-                VarScope.fullChecker(tokens);
+                VarScope.fullChecker(tokens, parentTable);
                 TokenUtil.consumeExpectedTokenByLexame(tokens, SEMICOLON);
             } else if (token.getType() == TokenType.IDENTIFIER) {
                 Token t1 = tokens.pop();
@@ -83,7 +79,7 @@ public class StatementDeclaration {
                     TokenUtil.consumeExpectedTokenByLexame(tokens, SEMICOLON);
                 } else {
                     TokenUtil.consumer(tokens);
-                    VarUsage.fullChecker(tokens);
+                    VarUsage.fullChecker(tokens, parentTable);
                     TokenUtil.consumeExpectedTokenByLexame(tokens, SEMICOLON);
                 }
             } else {

@@ -2,6 +2,7 @@ package semantic.analyzer.model;
 
 import java.util.HashMap;
 import java.util.Map;
+import static java.util.stream.Collectors.joining;
 import lexical.analyzer.model.Token;
 import semantic.analyzer.model.Identifiers.Identifier;
 import semantic.analyzer.model.exceptions.SymbolAlreadyDeclaredException;
@@ -37,6 +38,10 @@ public class SymTable {
         }
     }
 
+    public Identifier find(Token token) throws UndeclaredSymbolException {
+        return find(token.getLexame().getLexame().hashCode());
+    }
+
     public Identifier find(Integer identifier) throws UndeclaredSymbolException {
         return find(identifier, this);
     }
@@ -47,5 +52,13 @@ public class SymTable {
         }
         Identifier id = current.table.get(identifier);
         return id != null ? id : find(identifier, current.prev);
+    }
+    
+    @Override
+    public String toString(){
+        return table.entrySet()
+                .stream()
+                .map(entry -> entry.getKey() + " " + entry.getValue())
+                .collect(joining("\n"));
     }
 }

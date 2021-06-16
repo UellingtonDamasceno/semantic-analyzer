@@ -3,6 +3,7 @@ package syntax.analyzer.model.grammar;
 import java.util.Deque;
 import lexical.analyzer.enums.TokenType;
 import lexical.analyzer.model.Token;
+import semantic.analyzer.model.SymTable;
 import syntax.analyzer.model.exceptions.EOFNotExpectedException;
 import syntax.analyzer.model.exceptions.SyntaxErrorException;
 import syntax.analyzer.util.TokenUtil;
@@ -15,19 +16,22 @@ import static syntax.analyzer.util.Terminals.*;
  */
 public class VarScope {
 
-    public static void fullChecker(Deque<Token> tokens) throws EOFNotExpectedException, SyntaxErrorException {
+    private static SymTable parentScope;
+
+    public static void fullChecker(Deque<Token> tokens, SymTable parentScope) throws EOFNotExpectedException, SyntaxErrorException {
+        VarScope.parentScope = parentScope;
         typedVariableScoped(tokens);
         if (TokenUtil.testLexameBeforeConsume(tokens, EQUALS)) {
             allProductionsStartingWithEquals(tokens);
         } else {
-            VarUsage.fullChecker(tokens);
+            VarUsage.fullChecker(tokens, parentScope);
         }
     }
-
 
     public static void scopeModifierConsumer(Deque<Token> tokens) throws EOFNotExpectedException, SyntaxErrorException {
         try {
             TokenUtil.consumerByLexame(tokens, GLOBAL);
+            parentScope = Program.GLOBAL_SCOPE;
         } catch (SyntaxErrorException e) {
             try {
                 TokenUtil.consumerByLexame(tokens, LOCAL);
@@ -42,7 +46,7 @@ public class VarScope {
         TokenUtil.consumeExpectedTokenByLexame(tokens, DOT);
         TokenUtil.consumerByType(tokens, TokenType.IDENTIFIER, Terminals.IDENTIFIER);
     }
-    
+
     private static void allProductionsStartingWithEquals(Deque<Token> tokens) throws EOFNotExpectedException, SyntaxErrorException {
         try {
             VarDeclaration.variableDeclaratorConsumer(tokens);
@@ -84,7 +88,7 @@ public class VarScope {
                     }
                 }
             } else {
-                VarUsage.fullChecker(tokens);
+                VarUsage.fullChecker(tokens, parentScope);
             }
         }
     }

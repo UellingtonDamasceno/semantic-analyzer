@@ -3,8 +3,12 @@ package syntax.analyzer.model.grammar;
 import java.util.Deque;
 import lexical.analyzer.enums.TokenType;
 import lexical.analyzer.model.Token;
+import semantic.analyzer.model.Identifiers.ComplexIdentifier;
+import semantic.analyzer.model.SymTable;
+import semantic.analyzer.model.exceptions.UndeclaredSymbolException;
 import syntax.analyzer.model.exceptions.EOFNotExpectedException;
 import syntax.analyzer.model.exceptions.SyntaxErrorException;
+import syntax.analyzer.util.ErrorManager;
 import syntax.analyzer.util.TokenUtil;
 import syntax.analyzer.util.Terminals;
 import static syntax.analyzer.util.Terminals.*;
@@ -15,7 +19,10 @@ import static syntax.analyzer.util.Terminals.*;
  */
 public class VarUsage {
 
-    public static void fullChecker(Deque<Token> tokens) throws EOFNotExpectedException, SyntaxErrorException {
+    private static SymTable parentScope;
+
+    public static void fullChecker(Deque<Token> tokens, SymTable parentScope) throws EOFNotExpectedException, SyntaxErrorException {
+        VarUsage.parentScope = parentScope;
         if (TokenUtil.testLexameBeforeConsume(tokens, EQUALS)) {
             VarDeclaration.variableDeclaratorConsumer(tokens);
         } else if (TokenUtil.testLexameBeforeConsume(tokens, DOT)) {
@@ -35,7 +42,7 @@ public class VarUsage {
             try {
                 VarScope.typedVariableScoped(tokens);
                 if (TokenUtil.testLexameBeforeConsume(tokens, DOT)) {
-                    StructDeclaration.structUsageConsumer(tokens);
+                    StructDeclaration.structUsageConsumer(tokens, parentScope);
                 }
             } catch (SyntaxErrorException e1) {
                 EOFNotExpectedException.throwIfEmpty(tokens, IDENTIFIER);
@@ -50,7 +57,14 @@ public class VarUsage {
                 } else if (token.getType() == TokenType.IDENTIFIER
                         && nextToken.thisLexameIs(DOT.getVALUE())) {
                     TokenUtil.consumer(tokens);
-                    StructDeclaration.structUsageConsumer(tokens);
+                    try {
+                        var found = (ComplexIdentifier) Program.GLOBAL_SCOPE.find(token);
+                        StructDeclaration.structUsageConsumer(tokens, found.getSymTable());
+                    } catch (UndeclaredSymbolException ex) {
+                        ex.setInfo(token);
+                        ErrorManager.addNewSemanticalError(ex);
+                        StructDeclaration.structUsageConsumer(tokens);
+                    }
                 } else if (token.getType() == TokenType.IDENTIFIER
                         && nextToken.thisLexameIs(OPEN_BRACKET.getVALUE())) {
                     TokenUtil.consumer(tokens);
@@ -71,7 +85,7 @@ public class VarUsage {
             try {
                 VarScope.typedVariableScoped(tokens);
                 if (TokenUtil.testLexameBeforeConsume(tokens, DOT)) {
-                    StructDeclaration.structUsageConsumer(tokens);
+                    StructDeclaration.structUsageConsumer(tokens, parentScope);
                 }
             } catch (SyntaxErrorException e1) {
                 EOFNotExpectedException.throwIfEmpty(tokens, IDENTIFIER);
@@ -82,7 +96,14 @@ public class VarUsage {
                 if (token.getType() == TokenType.IDENTIFIER
                         && nextToken.thisLexameIs(DOT.getVALUE())) {
                     TokenUtil.consumer(tokens);
-                    StructDeclaration.structUsageConsumer(tokens);
+                    try {
+                        var found = (ComplexIdentifier) Program.GLOBAL_SCOPE.find(token);
+                        StructDeclaration.structUsageConsumer(tokens, found.getSymTable());
+                    } catch (UndeclaredSymbolException ex) {
+                        ex.setInfo(token);
+                        ErrorManager.addNewSemanticalError(ex);
+                        StructDeclaration.structUsageConsumer(tokens);
+                    }
                 } else if (token.getType() == TokenType.IDENTIFIER
                         && nextToken.thisLexameIs(OPEN_BRACKET.getVALUE())) {
                     TokenUtil.consumer(tokens);

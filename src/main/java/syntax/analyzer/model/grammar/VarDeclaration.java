@@ -3,9 +3,11 @@ package syntax.analyzer.model.grammar;
 import java.util.Deque;
 import lexical.analyzer.enums.TokenType;
 import lexical.analyzer.model.Token;
+import semantic.analyzer.model.Identifiers.ComplexIdentifier;
 import semantic.analyzer.model.Identifiers.SimpleIdentifier;
 import semantic.analyzer.model.SymTable;
 import semantic.analyzer.model.exceptions.SymbolAlreadyDeclaredException;
+import semantic.analyzer.model.exceptions.UndeclaredSymbolException;
 import syntax.analyzer.model.exceptions.EOFNotExpectedException;
 import syntax.analyzer.model.exceptions.SyntaxErrorException;
 import syntax.analyzer.util.ErrorManager;
@@ -26,7 +28,7 @@ public class VarDeclaration {
         table = parent;
         TokenUtil.consumer(tokens);
         TokenUtil.consumeExpectedTokenByLexame(tokens, OPEN_KEY);
-        
+
         try {
             typedVariableConsumer(tokens);
             TokenUtil.consumerByLexame(tokens, CLOSE_KEY);
@@ -44,7 +46,7 @@ public class VarDeclaration {
             }
         }
     }
-    
+
     public static void typedVariableConsumer(Deque<Token> tokens) throws SyntaxErrorException, EOFNotExpectedException {
         currentType = tokens.peek();
         TypeDeclaration.typeConsumer(tokens);
@@ -121,7 +123,14 @@ public class VarDeclaration {
                     VarScope.typedVariableScoped(tokens);
                 } else if (nextToken.thisLexameIs(DOT.getVALUE())) {
                     TokenUtil.consumer(tokens);
-                    StructDeclaration.structUsageConsumer(tokens);
+                    try {
+                        var found = (ComplexIdentifier) Program.GLOBAL_SCOPE.find(token);
+                        StructDeclaration.structUsageConsumer(tokens, found.getSymTable());
+                    } catch (UndeclaredSymbolException ex) {
+                        ex.setInfo(token);
+                        ErrorManager.addNewSemanticalError(ex);
+                        StructDeclaration.structUsageConsumer(tokens);
+                    }
                 } else if (nextToken.thisLexameIs(OPEN_PARENTHESES.getVALUE())) {
                     FunctionDeclaration.callFunctionConsumer(tokens);
                 } else {

@@ -45,10 +45,7 @@ public class SimpleIdentifier extends Identifier {
 
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 47 * hash + this.type.hashCode();
-        hash = 47 * hash + this.name.hashCode();
-        return hash;
+        return this.name.hashCode();
     }
 
     @Override

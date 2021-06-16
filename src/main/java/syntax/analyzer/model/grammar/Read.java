@@ -3,6 +3,8 @@ package syntax.analyzer.model.grammar;
 import java.util.Deque;
 import lexical.analyzer.enums.TokenType;
 import lexical.analyzer.model.Token;
+import semantic.analyzer.model.Identifiers.ComplexIdentifier;
+import semantic.analyzer.model.exceptions.UndeclaredSymbolException;
 import syntax.analyzer.model.exceptions.EOFNotExpectedException;
 import syntax.analyzer.util.ErrorManager;
 import syntax.analyzer.util.Terminals;
@@ -30,12 +32,20 @@ public class Read {
     }
 
     public static void expressionReadConsumer(Deque<Token> tokens) throws EOFNotExpectedException {
+        Token token = tokens.peek();
         TokenUtil.consumeExpectedTokenByType(tokens, TokenType.IDENTIFIER, Terminals.IDENTIFIER);
         if (!TokenUtil.testLexameBeforeConsume(tokens, CLOSE_PARENTHESES)
                 && !TokenUtil.testLexameBeforeConsume(tokens, COMMA)
                 && !TokenUtil.testLexameBeforeConsume(tokens, SEMICOLON)) {
             if (TokenUtil.testLexameBeforeConsume(tokens, DOT)) {
-                StructDeclaration.structUsageConsumer(tokens);
+                try {
+                    var found = (ComplexIdentifier) Program.GLOBAL_SCOPE.find(token);
+                    StructDeclaration.structUsageConsumer(tokens, found.getSymTable());
+                } catch (UndeclaredSymbolException ex) {
+                    ex.setInfo(token);
+                    ErrorManager.addNewSemanticalError(ex);
+                    StructDeclaration.structUsageConsumer(tokens);
+                }
             } else if (TokenUtil.testLexameBeforeConsume(tokens, OPEN_BRACKET)) {
                 Arrays.dimensionConsumer(tokens);
             } else {
