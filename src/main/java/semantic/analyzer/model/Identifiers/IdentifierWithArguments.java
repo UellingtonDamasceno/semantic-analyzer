@@ -16,7 +16,7 @@ import lexical.analyzer.model.Token;
  */
 public abstract class IdentifierWithArguments extends Identifier {
 
-    private ArgumentsState state;
+    protected ArgumentsState state;
 
     public IdentifierWithArguments(List<Entry<Token, Token>> args, Token name){
         this(args.stream().map((entry) -> {
@@ -43,7 +43,6 @@ public abstract class IdentifierWithArguments extends Identifier {
     
     @Override
     public final int hashCode() {
-//        System.out.println("identifier with arguments");
         int hash = 7;
         hash = 97 * hash + this.name.hashCode();
         hash = 97 * hash + state.size();

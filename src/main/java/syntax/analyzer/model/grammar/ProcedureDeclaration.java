@@ -3,11 +3,16 @@ package syntax.analyzer.model.grammar;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import lexical.analyzer.enums.TokenType;
 import lexical.analyzer.model.Token;
 import semantic.analyzer.model.Identifiers.IdentifierWithArguments;
 import semantic.analyzer.model.Identifiers.Procedure;
+import semantic.analyzer.model.Identifiers.SimpleIdentifier;
+import semantic.analyzer.model.SymTable;
 import semantic.analyzer.model.exceptions.SymbolAlreadyDeclaredException;
 import syntax.analyzer.model.exceptions.EOFNotExpectedException;
 import syntax.analyzer.model.exceptions.SyntaxErrorException;
@@ -22,6 +27,7 @@ import syntax.analyzer.util.TokenUtil;
  */
 public class ProcedureDeclaration {
 
+    private static SymTable table;
 
     public static void fullChecker(Deque<Token> tokens) throws SyntaxErrorException, EOFNotExpectedException {
         List<Entry<Token, Token>> arguments = new LinkedList();
@@ -38,13 +44,29 @@ public class ProcedureDeclaration {
             Signature.paramsChecker(tokens, arguments);
             TokenUtil.consumeExpectedTokenByLexame(tokens, CLOSE_PARENTHESES);
         }
-
+        table = loadArguments(arguments, new SymTable());
         IdentifierWithArguments procedure = new Procedure(arguments, name);
         try {
             Program.GLOBAL_SCOPE.insert(procedure, name);
         } catch (SymbolAlreadyDeclaredException ex) {
             ErrorManager.addNewSemanticalError(ex);
         }
-//        StatementDeclaration.fullChecker(tokens);
+        StatementDeclaration.fullChecker(tokens, table);
+    }
+
+    public static SymTable loadArguments(List<Entry<Token, Token>> arguments, SymTable table) {
+        arguments.stream().map(typedArg -> {
+            Token type = typedArg.getKey();
+            Token name = typedArg.getValue();
+            SimpleIdentifier id = new SimpleIdentifier(type, name, true);
+            return Map.entry(id, typedArg.getValue());
+        }).forEach(entry -> {
+            try {
+                table.insert(entry.getKey(), entry.getValue());
+            } catch (SymbolAlreadyDeclaredException ex) {
+                ErrorManager.addNewSemanticalError(ex);
+            }
+        });
+        return table;
     }
 }

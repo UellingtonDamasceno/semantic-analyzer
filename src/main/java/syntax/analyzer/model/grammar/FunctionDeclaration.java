@@ -8,6 +8,7 @@ import lexical.analyzer.enums.TokenType;
 import lexical.analyzer.model.Token;
 import semantic.analyzer.model.Identifiers.Function;
 import semantic.analyzer.model.Identifiers.IdentifierWithArguments;
+import semantic.analyzer.model.SymTable;
 import semantic.analyzer.model.exceptions.SymbolAlreadyDeclaredException;
 import syntax.analyzer.model.exceptions.EOFNotExpectedException;
 import syntax.analyzer.model.exceptions.SyntaxErrorException;
@@ -22,11 +23,13 @@ import syntax.analyzer.util.TokenUtil;
  */
 public class FunctionDeclaration {
 
-
     private static Token name;
     private static Token type;
 
+    private static SymTable table;
+
     public static void fullChecker(Deque<Token> tokens) throws SyntaxErrorException, EOFNotExpectedException {
+        table = new SymTable();
         List<Entry<Token, Token>> arguments = new LinkedList();
 
         TokenUtil.consumer(tokens);
@@ -46,21 +49,16 @@ public class FunctionDeclaration {
             Signature.paramsChecker(tokens, arguments);
             TokenUtil.consumeExpectedTokenByLexame(tokens, CLOSE_PARENTHESES);
         }
-        
+
+        table = ProcedureDeclaration.loadArguments(arguments, table);
         IdentifierWithArguments function = new Function(name, type, arguments);
         try {
             Program.GLOBAL_SCOPE.insert(function, name);
         } catch (SymbolAlreadyDeclaredException e) {
             ErrorManager.addNewSemanticalError(e);
         }
-        
-        blockFunctionChecker(tokens);    
-    }
 
-    public static void blockFunctionChecker(Deque<Token> tokens) throws SyntaxErrorException, EOFNotExpectedException {
-        TokenUtil.consumeExpectedTokenByLexame(tokens, OPEN_KEY);
-        StatementDeclaration.statementListChecker(tokens);
-        TokenUtil.consumeExpectedTokenByLexame(tokens, CLOSE_KEY);
+        StatementDeclaration.fullChecker(tokens, table);
     }
 
     public static void returnChecker(Deque<Token> tokens) throws EOFNotExpectedException {

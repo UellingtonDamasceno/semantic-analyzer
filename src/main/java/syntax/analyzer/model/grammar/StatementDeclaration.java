@@ -1,9 +1,13 @@
 package syntax.analyzer.model.grammar;
 
 import java.util.Deque;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import lexical.analyzer.enums.TokenType;
 import lexical.analyzer.model.Token;
+import semantic.analyzer.model.Identifiers.Identifier;
 import semantic.analyzer.model.SymTable;
+import semantic.analyzer.model.exceptions.UndeclaredSymbolException;
 import syntax.analyzer.model.exceptions.EOFNotExpectedException;
 import syntax.analyzer.model.exceptions.SyntaxErrorException;
 import syntax.analyzer.util.ErrorManager;
@@ -17,10 +21,10 @@ import syntax.analyzer.util.TokenUtil;
  */
 public class StatementDeclaration {
 
-    private static SymTable parent;
+    private static SymTable parentTable;
 
     public static void fullChecker(Deque<Token> tokens, SymTable parent) throws EOFNotExpectedException {
-        StatementDeclaration.parent = parent;
+        StatementDeclaration.parentTable = parent;
         TokenUtil.consumeExpectedTokenByLexame(tokens, OPEN_KEY);
         statementListChecker(tokens);
         TokenUtil.consumeExpectedTokenByLexame(tokens, CLOSE_KEY);
@@ -55,15 +59,15 @@ public class StatementDeclaration {
                 Print.fullChecker(tokens);
                 TokenUtil.consumeExpectedTokenByLexame(tokens, SEMICOLON);
             } else if (token.thisLexameIs(VAR.getVALUE())) {
-                VarDeclaration.fullChecker(tokens, parent);
+                VarDeclaration.fullChecker(tokens, parentTable);
             } else if (token.thisLexameIs(CONST.getVALUE())) {
-                ConstDeclaration.fullChecker(tokens, parent);
+                ConstDeclaration.fullChecker(tokens, parentTable);
             } else if (token.thisLexameIs(RETURN.getVALUE())) {
                 FunctionDeclaration.returnChecker(tokens);
             } else if (token.thisLexameIs(IF.getVALUE())) {
-                IfElse.fullChecker(tokens, parent);
+                IfElse.fullChecker(tokens, parentTable);
             } else if (token.thisLexameIs(WHILE.getVALUE())) {
-                WhileDeclaration.fullChecker(tokens, parent);
+                WhileDeclaration.fullChecker(tokens, parentTable);
             } else if (token.thisLexameIs(TYPEDEF.getVALUE())) {
                 StructDeclaration.fullChecker(tokens);
             } else if (token.thisLexameIs(GLOBAL.getVALUE()) || token.thisLexameIs(LOCAL.getVALUE())) {

@@ -17,7 +17,6 @@ public class Procedure extends IdentifierWithArguments {
     public Procedure(String identifier, List<Entry<String, String>> args) {
         super(args, identifier);
     }
-
     
     @Override
     public boolean equals(Object obj) {
