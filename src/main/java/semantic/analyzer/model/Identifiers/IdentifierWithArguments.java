@@ -4,8 +4,11 @@ import semantic.analyzer.model.arguments.ArgumentsSignature;
 import semantic.analyzer.model.arguments.ArgumentsState;
 import semantic.analyzer.model.arguments.Arguments;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import static java.util.stream.Collectors.toList;
 import java.util.stream.Stream;
+import lexical.analyzer.model.Token;
 
 /**
  *
@@ -15,6 +18,15 @@ public abstract class IdentifierWithArguments extends Identifier {
 
     private ArgumentsState state;
 
+    public IdentifierWithArguments(List<Entry<Token, Token>> args, Token name){
+        this(args.stream().map((entry) -> {
+                    String key = entry.getKey().getLexame().getLexame();
+                    String value = entry.getValue().getLexame().getLexame();
+                    return Map.entry(key, value);
+                }).collect(toList()),
+                name.getLexame().getLexame());
+    }
+    
     public IdentifierWithArguments(List<Entry<String, String>> args, String name) {
         super(name);
         this.state = new Arguments(args);
@@ -31,6 +43,7 @@ public abstract class IdentifierWithArguments extends Identifier {
     
     @Override
     public final int hashCode() {
+//        System.out.println("identifier with arguments");
         int hash = 7;
         hash = 97 * hash + this.name.hashCode();
         hash = 97 * hash + state.size();
@@ -40,6 +53,11 @@ public abstract class IdentifierWithArguments extends Identifier {
                 .sum();
     }
 
+    @Override
+    public String toString() {
+        return "IdentifierWithArguments{name= " +name + " arguments= " + state + '}';
+    }
+    
     @Override
     public abstract boolean equals(Object obj);
 

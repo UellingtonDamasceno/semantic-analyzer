@@ -9,5 +9,4 @@ public class IncompatibleArgumentSizeException extends Exception {
     public IncompatibleArgumentSizeException(String message) {
         super(message);
     }
-    
 }

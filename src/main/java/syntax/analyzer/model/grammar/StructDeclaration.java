@@ -1,8 +1,16 @@
 package syntax.analyzer.model.grammar;
 
 import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import lexical.analyzer.enums.TokenType;
 import lexical.analyzer.model.Token;
+import semantic.analyzer.model.Identifiers.ComplexIdentifier;
+import semantic.analyzer.model.SymTable;
+import semantic.analyzer.model.exceptions.SymbolAlreadyDeclaredException;
+import semantic.analyzer.model.exceptions.UndeclaredSymbolException;
 import syntax.analyzer.model.exceptions.EOFNotExpectedException;
 import syntax.analyzer.model.exceptions.SyntaxErrorException;
 import syntax.analyzer.util.ErrorManager;
@@ -16,7 +24,13 @@ import syntax.analyzer.util.TokenUtil;
  */
 public class StructDeclaration {
 
+    private static SymTable table;
+
     public static void fullChecker(Deque<Token> tokens) throws EOFNotExpectedException, SyntaxErrorException {
+        table = new SymTable();
+        Token inhereted = null;
+        ComplexIdentifier struct = null;
+
         TokenUtil.consumer(tokens);
         TokenUtil.consumerByLexame(tokens, STRUCT);
 
@@ -24,6 +38,7 @@ public class StructDeclaration {
             TokenUtil.consumer(tokens);
         } else if (TokenUtil.testLexameBeforeConsume(tokens, EXTENDS)) {
             TokenUtil.consumer(tokens);
+            inhereted = tokens.peek();
             TokenUtil.consumeExpectedTokenByType(tokens, TokenType.IDENTIFIER, Terminals.IDENTIFIER);
             TokenUtil.consumeExpectedTokenByLexame(tokens, OPEN_KEY);
         } else {
@@ -32,18 +47,42 @@ public class StructDeclaration {
         structDefConsumer(tokens);
         TokenUtil.consumeExpectedTokenByLexame(tokens, CLOSE_KEY);
         try {
+            Token token = tokens.peek();
+            String name = token.getLexame().getLexame();
+            if (inhereted == null) {
+                struct = new ComplexIdentifier(name, table, name);
+            } else {
+                try {
+                    List<String> loadInhereted = new LinkedList();
+                    loadInhereted.add(name);
+                    loadInhereted.addAll(ComplexIdentifier.loadInhereted(Program.GLOBAL_SCOPE, inhereted.getLexame().getLexame().hashCode()));
+                    struct = new ComplexIdentifier(name, table, loadInhereted);
+                } catch (UndeclaredSymbolException ex) {
+                    ex.setLine(token.getLexame().getLine());
+                    ex.setName(name);
+                    ErrorManager.addNewSemanticalError(ex);
+                }
+            }
+            if (struct != null) {
+                try {
+                    Program.GLOBAL_SCOPE.insert(struct, tokens.peek());
+                } catch (SymbolAlreadyDeclaredException ex) {
+                    ErrorManager.addNewSemanticalError(ex);
+                }
+            }
+
             TokenUtil.consumerByType(tokens, TokenType.IDENTIFIER, Terminals.IDENTIFIER);
         } catch (SyntaxErrorException e) {
-            ErrorManager.addNewInternalError(tokens, IDENTIFIER);
+            ErrorManager.addNewSyntaticalError(tokens, IDENTIFIER);
         }
         TokenUtil.consumeExpectedTokenByLexame(tokens, SEMICOLON);
     }
 
     public static void structDefConsumer(Deque<Token> tokens) throws EOFNotExpectedException, SyntaxErrorException {
         if (TokenUtil.testLexameBeforeConsume(tokens, VAR)) {
-            VarDeclaration.fullChecker(tokens);
+            VarDeclaration.fullChecker(tokens, table);
         } else if (TokenUtil.testLexameBeforeConsume(tokens, CONST)) {
-//            ConstDeclaration.fullChecker(tokens);
+            ConstDeclaration.fullChecker(tokens, table);
         } else {
             throw new SyntaxErrorException(tokens.peek().getLexame(), VAR, CONST);
         }

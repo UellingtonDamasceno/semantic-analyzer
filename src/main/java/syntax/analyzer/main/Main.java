@@ -49,7 +49,7 @@ public class Main {
                                     .map(Token::toString)
                                     .collect(toList());
                         }
-                        lines.addAll(ErrorManager.getErrors(showUnexpectedToken));
+                        lines.addAll(ErrorManager.getErrors(showUnexpectedToken, false));
                         FilesUtil.write(path, lines);
                         ErrorManager.clear();
                     });

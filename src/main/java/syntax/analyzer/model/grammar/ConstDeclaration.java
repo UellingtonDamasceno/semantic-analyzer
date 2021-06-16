@@ -23,7 +23,7 @@ public class ConstDeclaration {
     private static Token currentType;
     
     public static void fullChecker(Deque<Token> tokens, SymTable parent) throws EOFNotExpectedException {
-        table = new SymTable(parent);
+        table = parent;
         TokenUtil.consumer(tokens);
         TokenUtil.consumeExpectedTokenByLexame(tokens, OPEN_KEY);
         try {
@@ -31,7 +31,7 @@ public class ConstDeclaration {
             TokenUtil.consumeExpectedTokenByLexame(tokens, CLOSE_KEY);
         } catch (SyntaxErrorException e) {
             if (TokenUtil.testLexameBeforeConsume(tokens, CLOSE_KEY)) {
-                ErrorManager.addNewInternalError(e);
+                ErrorManager.addNewSyntaticalError(e);
                 TokenUtil.consumer(tokens);
             }
         }
@@ -42,7 +42,7 @@ public class ConstDeclaration {
             currentType = tokens.peek();
             TypeDeclaration.typeConsumer(tokens);
         } catch (SyntaxErrorException e) {
-            ErrorManager.addNewInternalError(tokens, INT, REAL, STRING, BOOLEAN);
+            ErrorManager.addNewSyntaticalError(tokens, INT, REAL, STRING, BOOLEAN);
             throw e;
         }
         try {
@@ -51,7 +51,7 @@ public class ConstDeclaration {
         } catch (SyntaxErrorException e) {
             EOFNotExpectedException.throwIfEmpty(tokens, CLOSE_KEY);
             if (TypeDeclaration.typeChecker(tokens.peek())) {
-                ErrorManager.addNewInternalError(e);
+                ErrorManager.addNewSyntaticalError(e);
                 typedConstConsumer(tokens);
             } else {
                 throw e;
@@ -69,7 +69,7 @@ public class ConstDeclaration {
             TokenUtil.consumer(tokens);
             constConsumer(tokens);
         } else if (TokenUtil.testTypeBeforeConsume(tokens, TokenType.IDENTIFIER, Terminals.IDENTIFIER)) {
-            ErrorManager.addNewInternalError(tokens, COMMA, SEMICOLON);
+            ErrorManager.addNewSyntaticalError(tokens, COMMA, SEMICOLON);
             constConsumer(tokens);
         }
     }
@@ -77,16 +77,16 @@ public class ConstDeclaration {
     public static void constDeclarator(Deque<Token> tokens) throws SyntaxErrorException, EOFNotExpectedException {
         SimpleIdentifier id = new SimpleIdentifier(currentType, tokens.peek(), false);
         try {
-            table.insert(id);
+            table.insert(id, tokens.peek());
         } catch (SymbolAlreadyDeclaredException ex) {
-            System.out.println("Já cadastrado!"+ id);
+            ErrorManager.addNewSemanticalError(ex);
         }
         TokenUtil.consumerByType(tokens, TokenType.IDENTIFIER, Terminals.IDENTIFIER);
         TokenUtil.consumeExpectedTokenByLexame(tokens, EQUALS);
         try {
             TypeDeclaration.literalConsumer(tokens);
         } catch (SyntaxErrorException e) {
-            ErrorManager.addNewInternalError(tokens, TRUE, FALSE, INT, REAL, STRING);
+            ErrorManager.addNewSyntaticalError(tokens, TRUE, FALSE, INT, REAL, STRING);
             TokenUtil.consumer(tokens);
         }
     }

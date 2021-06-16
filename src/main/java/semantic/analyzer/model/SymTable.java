@@ -2,6 +2,7 @@ package semantic.analyzer.model;
 
 import java.util.HashMap;
 import java.util.Map;
+import lexical.analyzer.model.Token;
 import semantic.analyzer.model.Identifiers.Identifier;
 import semantic.analyzer.model.exceptions.SymbolAlreadyDeclaredException;
 import semantic.analyzer.model.exceptions.UndeclaredSymbolException;
@@ -12,7 +13,7 @@ import semantic.analyzer.model.exceptions.UndeclaredSymbolException;
  */
 public class SymTable {
 
-    private Map<String, Identifier> table;
+    private Map<Integer, Identifier> table;
     private SymTable prev;
 
     public SymTable() {
@@ -24,32 +25,23 @@ public class SymTable {
         this.prev = parent;
     }
 
-    public void insert(Identifier id) throws SymbolAlreadyDeclaredException {
-        String name = id.getName();
+    public void insert(Identifier id, Token token) throws SymbolAlreadyDeclaredException {
+        int identifier = id.hashCode();
         try {
-            Identifier found = this.find(name, this);
+            Identifier found = this.find(identifier);
             if (found.equals(id)) {
-                throw new SymbolAlreadyDeclaredException();
+                throw new SymbolAlreadyDeclaredException(id, token);
             }
         } catch (UndeclaredSymbolException ex) {
-            this.table.put(name, id);
+            this.table.put(identifier, id);
         }
     }
 
-    public boolean containsIdentifier(String identifier) {
-        try {
-            find(identifier);
-            return true;
-        } catch (UndeclaredSymbolException ex) {
-            return false;
-        }
-    }
-
-    public Identifier find(String identifier) throws UndeclaredSymbolException {
+    public Identifier find(Integer identifier) throws UndeclaredSymbolException {
         return find(identifier, this);
     }
 
-    private Identifier find(String identifier, SymTable current) throws UndeclaredSymbolException {
+    private Identifier find(Integer identifier, SymTable current) throws UndeclaredSymbolException {
         if (current == null) {
             throw new UndeclaredSymbolException();
         }

@@ -57,7 +57,7 @@ public class TokenUtil {
         try {
             TokenUtil.consumerByLexame(tokens, terminal);
         } catch (SyntaxErrorException e) {
-            ErrorManager.addNewInternalError(tokens, terminal);
+            ErrorManager.addNewSyntaticalError(tokens, terminal);
         }
     }
 
@@ -65,7 +65,7 @@ public class TokenUtil {
         try {
             TokenUtil.consumerByType(tokens, tokenType, terminal);
         } catch (SyntaxErrorException e) {
-            ErrorManager.addNewInternalError(tokens, terminal);
+            ErrorManager.addNewSyntaticalError(tokens, terminal);
         }
     }            
 }

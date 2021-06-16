@@ -2,6 +2,7 @@ package semantic.analyzer.model.Identifiers;
 
 import java.util.List;
 import semantic.analyzer.model.SymTable;
+import semantic.analyzer.model.exceptions.UndeclaredSymbolException;
 
 /**
  *
@@ -12,10 +13,10 @@ public class ComplexIdentifier extends Identifier {
     private SymTable symTable;
     private final List<String> inhetedTypes;
 
-    public ComplexIdentifier(String name, String... types){
+    public ComplexIdentifier(String name, String... types) {
         this(name, new SymTable(), List.of(types));
     }
-    
+
     public ComplexIdentifier(String name, SymTable symTable, String... types) {
         this(name, symTable, List.of(types));
     }
@@ -24,6 +25,7 @@ public class ComplexIdentifier extends Identifier {
         super(name);
         this.symTable = symTable;
         this.inhetedTypes = inhetedTypes;
+        System.out.println(inhetedTypes);
     }
 
     public boolean hasParent() {
@@ -31,11 +33,12 @@ public class ComplexIdentifier extends Identifier {
     }
 
     public boolean isInstance(String parentType) {
-        return hasParent() && inhetedTypes.contains(parentType);
+        return inhetedTypes.contains(parentType);
     }
 
-    public boolean containsAttribute(String attribute) {
-        return symTable.containsIdentifier(attribute);
+    public static List<String> loadInhereted(SymTable table, Integer parent) throws UndeclaredSymbolException {
+        ComplexIdentifier struct = (ComplexIdentifier) table.find(parent);
+        return struct.inhetedTypes;
     }
 
     @Override

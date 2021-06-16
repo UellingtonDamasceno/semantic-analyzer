@@ -28,7 +28,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>semantic.analyzer.main.Main</mainClass>
+                            <mainClass>syntax.analyzer.main.Main</mainClass>
                         </manifest>
                     </archive> 
                 </configuration>

@@ -18,7 +18,8 @@ import static syntax.analyzer.util.Terminals.*;
  */
 public class ErrorManager {
 
-    private static List<SyntaxErrorException> ERRORS = new LinkedList();
+    private static List<SyntaxErrorException> syntaticalErrors = new LinkedList();
+    private static List<Exception> semanticalErrors = new LinkedList();
     private static List<String> unexpectedToken = new LinkedList();
     private static EOFNotExpectedException E;
 
@@ -41,7 +42,6 @@ public class ErrorManager {
         }
     }
 
-    
     public static void consumer(Deque<Token> tokens) {
         unexpectedToken.add("TOKEN INESPERADO: \""
                 + tokens.peek().getLexame().getLexame()
@@ -56,20 +56,28 @@ public class ErrorManager {
         }
     }
 
-    public static void addNewInternalError(Deque<Token> tokens, Terminals ... terminals) {
-        ERRORS.add(new SyntaxErrorException(tokens.peek().getLexame(), terminals));
-    }
-    
-    public static void addNewInternalError(SyntaxErrorException e) {
-        ERRORS.add(e);
+    public static void addNewSyntaticalError(Deque<Token> tokens, Terminals... terminals) {
+        syntaticalErrors.add(new SyntaxErrorException(tokens.peek().getLexame(), terminals));
     }
 
-    public static List<String> getErrors(boolean showUnexpectedTokens) {
-        List<String> lines = ERRORS.stream()
-                .map(SyntaxErrorException::getSyntaticalError)
-                .map(SyntaticalError::toString)
-                .collect(toList());
+    public static void addNewSyntaticalError(SyntaxErrorException e) {
+        syntaticalErrors.add(e);
+    }
 
+    public static List<String> getErrors(boolean showUnexpectedTokens, boolean showSyntaticalErrors) {
+        List<String> lines = new LinkedList();
+
+        if (showSyntaticalErrors) {
+            lines = syntaticalErrors.stream()
+                    .map(SyntaxErrorException::getSyntaticalError)
+                    .map(SyntaticalError::toString)
+                    .collect(toList());
+        }
+        
+        lines.addAll(semanticalErrors.stream()
+                .map(Exception::getMessage)
+                .collect(toList()));
+        
         if (showUnexpectedTokens && !unexpectedToken.isEmpty()) {
             lines.addAll(unexpectedToken);
         }
@@ -86,8 +94,12 @@ public class ErrorManager {
     }
 
     public static void clear() {
-        ERRORS.clear();
+        syntaticalErrors.clear();
         E = null;
         unexpectedToken.clear();
+    }
+
+    public static void addNewSemanticalError(Exception e) {
+        semanticalErrors.add(e);
     }
 }

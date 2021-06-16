@@ -46,7 +46,7 @@ public class Program {
             } else if (token.thisLexameIs(TYPEDEF.getVALUE())) {
                 StructDeclaration.fullChecker(tokens);
             } else if (token.thisLexameIs(VAR.getVALUE())) {
-                VarDeclaration.fullChecker(tokens);
+                VarDeclaration.fullChecker(tokens, GLOBAL_SCOPE);
             } else if (token.thisLexameIs(CONST.getVALUE())) {
                 ConstDeclaration.fullChecker(tokens, GLOBAL_SCOPE);
             } else if (token.thisLexameIs(PROCEDURE.getVALUE())) {
@@ -60,15 +60,19 @@ public class Program {
                     ProcedureDeclaration.fullChecker(tokens);
                 }
             } else if (token.thisLexameIs(OPEN_KEY.getVALUE())) {
+                System.out.println("entrei ?");
                 ErrorManager.genericBlockConsumer(tokens);
             } else if (token.getType() == TokenType.IDENTIFIER
                     || TypeDeclaration.typeChecker(token)) {
+                System.out.println(token);
+                System.out.println("entrou aqui");
                 Signature.fullChecker(tokens);
             } else {
+                System.out.println(token);
                 ErrorManager.consumer(tokens);
             }
         } catch (SyntaxErrorException e1) {
-            ErrorManager.addNewInternalError(e1);
+            ErrorManager.addNewSyntaticalError(e1);
         }
     }
 }

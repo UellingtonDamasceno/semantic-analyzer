@@ -1,7 +1,10 @@
 package semantic.analyzer.model.Identifiers;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import static java.util.stream.Collectors.toList;
+import lexical.analyzer.model.Token;
 
 /**
  *
@@ -10,6 +13,16 @@ import java.util.Map.Entry;
 public class Function extends IdentifierWithArguments {
 
     private final String typeReturn;
+
+    public Function(Token identifier, Token typeReturn, List<Entry<Token, Token>> args) {
+        this(identifier.getLexame().getLexame(),
+                typeReturn.getLexame().getLexame(),
+                args.stream().map((entry) -> {
+                    String key = entry.getKey().getLexame().getLexame();
+                    String value = entry.getValue().getLexame().getLexame();
+                    return Map.entry(key, value);
+                }).collect(toList()));
+    }
 
     public Function(String identifier, String typeReturn, List<Entry<String, String>> args) {
         super(args, identifier);
@@ -22,6 +35,6 @@ public class Function extends IdentifierWithArguments {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof Function && ((Function) obj).hashCode() == this.hashCode();
+        return obj instanceof IdentifierWithArguments && ((IdentifierWithArguments) obj).hashCode() == this.hashCode();
     }
 }

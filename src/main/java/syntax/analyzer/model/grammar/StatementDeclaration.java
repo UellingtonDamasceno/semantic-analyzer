@@ -51,7 +51,7 @@ public class StatementDeclaration {
                 Print.fullChecker(tokens);
                 TokenUtil.consumeExpectedTokenByLexame(tokens, SEMICOLON);
             } else if (token.thisLexameIs(VAR.getVALUE())) {
-                VarDeclaration.fullChecker(tokens);
+//                VarDeclaration.fullChecker(tokens);
             } else if (token.thisLexameIs(CONST.getVALUE())) {
 //                ConstDeclaration.fullChecker(tokens);
             } else if (token.thisLexameIs(RETURN.getVALUE())) {
@@ -82,7 +82,7 @@ public class StatementDeclaration {
                 ErrorManager.consumer(tokens);
             }
         } catch (SyntaxErrorException e) {
-            ErrorManager.addNewInternalError(e);
+            ErrorManager.addNewSyntaticalError(e);
         }
 
     }

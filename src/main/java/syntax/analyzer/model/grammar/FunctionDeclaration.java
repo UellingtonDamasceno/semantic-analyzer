@@ -1,8 +1,14 @@
 package syntax.analyzer.model.grammar;
 
 import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map.Entry;
 import lexical.analyzer.enums.TokenType;
 import lexical.analyzer.model.Token;
+import semantic.analyzer.model.Identifiers.Function;
+import semantic.analyzer.model.Identifiers.IdentifierWithArguments;
+import semantic.analyzer.model.exceptions.SymbolAlreadyDeclaredException;
 import syntax.analyzer.model.exceptions.EOFNotExpectedException;
 import syntax.analyzer.model.exceptions.SyntaxErrorException;
 import syntax.analyzer.util.ErrorManager;
@@ -16,22 +22,39 @@ import syntax.analyzer.util.TokenUtil;
  */
 public class FunctionDeclaration {
 
+
+    private static Token name;
+    private static Token type;
+
     public static void fullChecker(Deque<Token> tokens) throws SyntaxErrorException, EOFNotExpectedException {
+        List<Entry<Token, Token>> arguments = new LinkedList();
+
         TokenUtil.consumer(tokens);
         try {
+            type = tokens.peek();
             TypeDeclaration.typeConsumer(tokens);
         } catch (SyntaxErrorException e) {
-            ErrorManager.addNewInternalError(tokens, INT, REAL, STRING, BOOLEAN);
+            ErrorManager.addNewSyntaticalError(tokens, INT, REAL, STRING, BOOLEAN);
         }
-        TokenUtil.consumeExpectedTokenByType(tokens, TokenType.IDENTIFIER,  Terminals.IDENTIFIER);
+
+        name = tokens.peek();
+        TokenUtil.consumeExpectedTokenByType(tokens, TokenType.IDENTIFIER, Terminals.IDENTIFIER);
         TokenUtil.consumeExpectedTokenByLexame(tokens, OPEN_PARENTHESES);
         try {
             TokenUtil.consumerByLexame(tokens, CLOSE_PARENTHESES);
         } catch (SyntaxErrorException e) {
-            Signature.paramsChecker(tokens);
+            Signature.paramsChecker(tokens, arguments);
             TokenUtil.consumeExpectedTokenByLexame(tokens, CLOSE_PARENTHESES);
         }
-        blockFunctionChecker(tokens);
+        
+        IdentifierWithArguments function = new Function(name, type, arguments);
+        try {
+            Program.GLOBAL_SCOPE.insert(function, name);
+        } catch (SymbolAlreadyDeclaredException e) {
+            ErrorManager.addNewSemanticalError(e);
+        }
+        
+        blockFunctionChecker(tokens);    
     }
 
     public static void blockFunctionChecker(Deque<Token> tokens) throws SyntaxErrorException, EOFNotExpectedException {
@@ -50,7 +73,7 @@ public class FunctionDeclaration {
         boolean isPrimaryReturn = TypeDeclaration.primaryChecker(token);
 
         if (!isEmptyReturn && !isPrimaryReturn) {
-             ErrorManager.addNewInternalError(tokens,
+            ErrorManager.addNewSyntaticalError(tokens,
                     SEMICOLON,
                     IDENTIFIER,
                     TRUE,
@@ -60,7 +83,6 @@ public class FunctionDeclaration {
                     INT);
         }
         try {
-
             if (token.getType() == TokenType.IDENTIFIER
                     && nextToken.thisLexameIs(OPEN_PARENTHESES.getVALUE())) {
                 callFunctionConsumer(tokens);
@@ -71,7 +93,7 @@ public class FunctionDeclaration {
                 Expressions.fullChecker(tokens);
             }
         } catch (SyntaxErrorException e) {
-            ErrorManager.addNewInternalError(tokens,
+            ErrorManager.addNewSyntaticalError(tokens,
                     SEMICOLON,
                     IDENTIFIER,
                     TRUE,
@@ -99,7 +121,7 @@ public class FunctionDeclaration {
             TokenUtil.consumer(tokens);
             argsListConsumer(tokens);
         } else if (TypeDeclaration.primaryChecker(tokens.peek())) {
-            ErrorManager.addNewInternalError(tokens, COMMA, CLOSE_PARENTHESES);
+            ErrorManager.addNewSyntaticalError(tokens, COMMA, CLOSE_PARENTHESES);
             argsListConsumer(tokens);
         }
     }

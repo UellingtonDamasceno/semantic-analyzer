@@ -25,7 +25,7 @@ public class Arrays {
             try {
                 TokenUtil.consumerByType(tokens, TokenType.IDENTIFIER, Terminals.IDENTIFIER);
             } catch (SyntaxErrorException e) {
-                ErrorManager.addNewInternalError(tokens, INT, IDENTIFIER);
+                ErrorManager.addNewSyntaticalError(tokens, INT, IDENTIFIER);
             }
         }
         TokenUtil.consumeExpectedTokenByLexame(tokens, CLOSE_BRACKET);

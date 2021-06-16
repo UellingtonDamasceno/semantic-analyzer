@@ -3,6 +3,7 @@ package semantic.analyzer.model.arguments;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toSet;
 
 /**
@@ -40,4 +41,9 @@ public class Arguments implements ArgumentsState<String> {
         return this;
     }
 
+    @Override
+    public String toString() {
+        return arguments.stream().map((entry) -> entry.getKey()+" "+entry.getValue()).collect(Collectors.joining());
+    }
+    
 }

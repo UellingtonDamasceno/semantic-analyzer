@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import semantic.analyzer.model.exceptions.IncompatibleArgumentSizeException;
 import semantic.analyzer.model.exceptions.IncompatibleTypesException;
-import semantic.analyzer.util.ErrorManager;
+import syntax.analyzer.util.ErrorManager;
 
 /**
  *
@@ -39,10 +39,10 @@ public class ArgumentsSignature implements ArgumentsState<String> {
     @Override
     public ArgumentsState<String> changeState(List<Map.Entry<String, String>> args) {
         if (args.size() != arguments.size()) {
-            ErrorManager.addNewError(new IncompatibleArgumentSizeException("Tamanhos incompatíveis"));
+            ErrorManager.addNewSemanticalError(new IncompatibleArgumentSizeException("Tamanhos incompatíveis"));
         }
         if (!isValidParams(args)) {
-            ErrorManager.addNewError(new IncompatibleTypesException("Tipos incompatíveis"));
+            ErrorManager.addNewSemanticalError(new IncompatibleTypesException("Tipos incompatíveis"));
         }
         return new Arguments(args);
     }

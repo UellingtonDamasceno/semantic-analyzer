@@ -19,9 +19,9 @@ public class Read {
         TokenUtil.consumer(tokens);
         TokenUtil.consumeExpectedTokenByLexame(tokens, OPEN_PARENTHESES);
         if (TokenUtil.testLexameBeforeConsume(tokens, CLOSE_PARENTHESES)) {
-            ErrorManager.addNewInternalError(tokens, IDENTIFIER);
+            ErrorManager.addNewSyntaticalError(tokens, IDENTIFIER);
         } else if (TokenUtil.testLexameBeforeConsume(tokens, COMMA)) {
-            ErrorManager.addNewInternalError(tokens, IDENTIFIER);
+            ErrorManager.addNewSyntaticalError(tokens, IDENTIFIER);
             moreReadings(tokens);
         } else {
             expressionReadConsumer(tokens);
@@ -39,7 +39,7 @@ public class Read {
             } else if (TokenUtil.testLexameBeforeConsume(tokens, OPEN_BRACKET)) {
                 Arrays.dimensionConsumer(tokens);
             } else {
-                ErrorManager.addNewInternalError(tokens, DOT, OPEN_BRACKET, COMMA, CLOSE_PARENTHESES);
+                ErrorManager.addNewSyntaticalError(tokens, DOT, OPEN_BRACKET, COMMA, CLOSE_PARENTHESES);
                 TokenUtil.consumer(tokens);
             }
         }
@@ -47,7 +47,7 @@ public class Read {
         if (TokenUtil.testLexameBeforeConsume(tokens, COMMA)) {
             moreReadings(tokens);
         } else if (TokenUtil.testTypeBeforeConsume(tokens, TokenType.IDENTIFIER, Terminals.IDENTIFIER)) {
-            ErrorManager.addNewInternalError(tokens, COMMA, CLOSE_PARENTHESES);
+            ErrorManager.addNewSyntaticalError(tokens, COMMA, CLOSE_PARENTHESES);
             expressionReadConsumer(tokens);
         }
     }
