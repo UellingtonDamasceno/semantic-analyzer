@@ -10,9 +10,9 @@ import semantic.analyzer.model.exceptions.UndeclaredSymbolException;
 import syntax.analyzer.model.exceptions.EOFNotExpectedException;
 import syntax.analyzer.model.exceptions.SyntaxErrorException;
 import syntax.analyzer.util.ErrorManager;
-import syntax.analyzer.util.TokenUtil;
 import syntax.analyzer.util.Terminals;
 import static syntax.analyzer.util.Terminals.*;
+import syntax.analyzer.util.TokenUtil;
 
 /**
  *
