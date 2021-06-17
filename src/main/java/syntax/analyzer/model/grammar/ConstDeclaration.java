@@ -5,6 +5,8 @@ import lexical.analyzer.enums.TokenType;
 import lexical.analyzer.model.Token;
 import semantic.analyzer.model.Identifiers.SimpleIdentifier;
 import semantic.analyzer.model.SymTable;
+import semantic.analyzer.model.exceptions.ForbiddenCastException;
+import semantic.analyzer.model.exceptions.InvalidAssignException;
 import semantic.analyzer.model.exceptions.SymbolAlreadyDeclaredException;
 import syntax.analyzer.model.exceptions.EOFNotExpectedException;
 import syntax.analyzer.model.exceptions.SyntaxErrorException;
@@ -21,7 +23,7 @@ public class ConstDeclaration {
 
     private static SymTable table;
     private static Token currentType;
-    
+
     public static void fullChecker(Deque<Token> tokens, SymTable parent) throws EOFNotExpectedException {
         table = parent;
         TokenUtil.consumer(tokens);
@@ -84,10 +86,15 @@ public class ConstDeclaration {
         TokenUtil.consumerByType(tokens, TokenType.IDENTIFIER, Terminals.IDENTIFIER);
         TokenUtil.consumeExpectedTokenByLexame(tokens, EQUALS);
         try {
+            Token token = tokens.peek();
             TypeDeclaration.literalConsumer(tokens);
+            TypeDeclaration.typeValidation(currentType, token);
+
         } catch (SyntaxErrorException e) {
             ErrorManager.addNewSyntaticalError(tokens, TRUE, FALSE, INT, REAL, STRING);
             TokenUtil.consumer(tokens);
         }
     }
+
+    
 }

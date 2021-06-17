@@ -4,8 +4,10 @@ import java.util.Deque;
 import java.util.List;
 import lexical.analyzer.enums.TokenType;
 import lexical.analyzer.model.Token;
+import semantic.analyzer.model.exceptions.ForbiddenCastException;
 import syntax.analyzer.model.exceptions.EOFNotExpectedException;
 import syntax.analyzer.model.exceptions.SyntaxErrorException;
+import syntax.analyzer.util.ErrorManager;
 import syntax.analyzer.util.Terminals;
 import static syntax.analyzer.util.Terminals.*;
 import syntax.analyzer.util.TokenUtil;
@@ -66,6 +68,7 @@ public class TypeDeclaration {
         return token.thisLexameIs(REAL.getVALUE()) || token.thisLexameIs(INT.getVALUE());
     }
 
+    
     public static void literalConsumer(Deque<Token> tokens) throws EOFNotExpectedException, SyntaxErrorException {
         EOFNotExpectedException.throwIfEmpty(tokens, TRUE, FALSE, REAL, INT, STRING);
         Token token = tokens.peek();
@@ -76,6 +79,19 @@ public class TypeDeclaration {
             throw new SyntaxErrorException(token.getLexame(), TRUE, FALSE, STRING, INT, REAL);
         }
         TokenUtil.consumer(tokens);
+    }
+    
+    public static void typeValidation(Token type, Token toValidate) {
+        if (type.thisLexameIs(BOOLEAN.getVALUE())
+                && !(toValidate.thisLexameIs(TRUE.getVALUE()) || toValidate.thisLexameIs(FALSE.getVALUE()))) {
+            ErrorManager.addNewSemanticalError(new ForbiddenCastException(toValidate, BOOLEAN.getVALUE()));
+        } else if ((type.thisLexameIs(INT.getVALUE()) || type.thisLexameIs(REAL.getVALUE()))
+                && !(toValidate.getType() == TokenType.NUMBER)) {
+            ErrorManager.addNewSemanticalError(new ForbiddenCastException(toValidate, INT.getVALUE(), REAL.getVALUE()));
+        } else if (type.thisLexameIs(STRING.getVALUE())
+                && !(toValidate.getType() == TokenType.STRING)) {
+            ErrorManager.addNewSemanticalError(new ForbiddenCastException(toValidate, STRING.getVALUE()));
+        }
     }
 
 }

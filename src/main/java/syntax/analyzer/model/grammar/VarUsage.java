@@ -6,7 +6,7 @@ import lexical.analyzer.model.Token;
 import semantic.analyzer.model.Identifiers.ComplexIdentifier;
 import semantic.analyzer.model.Identifiers.Identifier;
 import semantic.analyzer.model.SymTable;
-import semantic.analyzer.model.exceptions.InvalidAssingException;
+import semantic.analyzer.model.exceptions.InvalidAssignException;
 import semantic.analyzer.model.exceptions.UndeclaredSymbolException;
 import syntax.analyzer.model.exceptions.EOFNotExpectedException;
 import syntax.analyzer.model.exceptions.SyntaxErrorException;
@@ -29,7 +29,7 @@ public class VarUsage {
             try {
                 Identifier found = parentScope.find(id);
                 if (found.isConstant()) {
-                    ErrorManager.addNewSemanticalError(new InvalidAssingException(found, id));
+                    ErrorManager.addNewSemanticalError(new InvalidAssignException(found, id));
                 }
             } catch (UndeclaredSymbolException ex) {
                 ex.setInfo(id);

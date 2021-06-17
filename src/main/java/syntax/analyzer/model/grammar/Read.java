@@ -8,7 +8,7 @@ import lexical.analyzer.model.Token;
 import semantic.analyzer.model.Identifiers.ComplexIdentifier;
 import semantic.analyzer.model.Identifiers.Identifier;
 import semantic.analyzer.model.SymTable;
-import semantic.analyzer.model.exceptions.InvalidAssingException;
+import semantic.analyzer.model.exceptions.InvalidAssignException;
 import semantic.analyzer.model.exceptions.UndeclaredSymbolException;
 import syntax.analyzer.model.exceptions.EOFNotExpectedException;
 import syntax.analyzer.util.ErrorManager;
@@ -44,7 +44,7 @@ public class Read {
         try {
             Identifier found = scope.find(token);
             if (found.isConstant()) {
-                ErrorManager.addNewSemanticalError(new InvalidAssingException(found, token));
+                ErrorManager.addNewSemanticalError(new InvalidAssignException(found, token));
             }
         } catch (UndeclaredSymbolException ex) {
             ex.setInfo(token);

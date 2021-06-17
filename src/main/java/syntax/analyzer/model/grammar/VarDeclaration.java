@@ -1,9 +1,12 @@
 package syntax.analyzer.model.grammar;
 
 import java.util.Deque;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import lexical.analyzer.enums.TokenType;
 import lexical.analyzer.model.Token;
 import semantic.analyzer.model.Identifiers.ComplexIdentifier;
+import semantic.analyzer.model.Identifiers.Identifier;
 import semantic.analyzer.model.Identifiers.SimpleIdentifier;
 import semantic.analyzer.model.SymTable;
 import semantic.analyzer.model.exceptions.SymbolAlreadyDeclaredException;
@@ -81,7 +84,8 @@ public class VarDeclaration {
         } catch (SymbolAlreadyDeclaredException ex) {
             ErrorManager.addNewSemanticalError(ex);
         }
-
+        
+        
         TokenUtil.consumerByType(tokens, TokenType.IDENTIFIER, IDENTIFIER);
         if (TokenUtil.testLexameBeforeConsume(tokens, EQUALS)) {
             variableDeclaratorConsumer(tokens, scope);
@@ -113,7 +117,6 @@ public class VarDeclaration {
                     || TypeDeclaration.primaryChecker(token)
                     || token.thisLexameIs(LOCAL.getVALUE())
                     || token.thisLexameIs(GLOBAL.getVALUE())) {
-
                 token = tokens.pop();
                 EOFNotExpectedException.throwIfEmpty(tokens, IDENTIFIER, LOCAL, GLOBAL, DOT, EXPRESSION);
                 Token nextToken = tokens.peek();
