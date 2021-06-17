@@ -1,12 +1,9 @@
 package syntax.analyzer.model.grammar;
 
 import java.util.Deque;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import lexical.analyzer.enums.TokenType;
 import lexical.analyzer.model.Token;
 import semantic.analyzer.model.Identifiers.ComplexIdentifier;
-import semantic.analyzer.model.Identifiers.Identifier;
 import semantic.analyzer.model.Identifiers.SimpleIdentifier;
 import semantic.analyzer.model.SymTable;
 import semantic.analyzer.model.exceptions.SymbolAlreadyDeclaredException;
@@ -25,13 +22,12 @@ import syntax.analyzer.util.TokenUtil;
 public class VarDeclaration {
 
     private static SymTable scope;
-    private static Token currentType;
+    private static Token type;
 
     public static void fullChecker(Deque<Token> tokens, SymTable parent) throws EOFNotExpectedException {
         scope = parent;
         TokenUtil.consumer(tokens);
         TokenUtil.consumeExpectedTokenByLexame(tokens, OPEN_KEY);
-
         try {
             typedVariableConsumer(tokens);
             TokenUtil.consumerByLexame(tokens, CLOSE_KEY);
@@ -51,7 +47,7 @@ public class VarDeclaration {
     }
 
     public static void typedVariableConsumer(Deque<Token> tokens) throws SyntaxErrorException, EOFNotExpectedException {
-        currentType = tokens.peek();
+        type = tokens.peek();
         TypeDeclaration.typeConsumer(tokens);
         try {
             variableConsumer(tokens);
@@ -80,15 +76,14 @@ public class VarDeclaration {
 
     public static void variableConsumer(Deque<Token> tokens) throws SyntaxErrorException, EOFNotExpectedException {
         try {
-            scope.insert(new SimpleIdentifier(currentType, tokens.peek(), false), tokens.peek());
+            scope.insert(new SimpleIdentifier(type, tokens.peek(), false), tokens.peek());
         } catch (SymbolAlreadyDeclaredException ex) {
             ErrorManager.addNewSemanticalError(ex);
         }
         
-        
         TokenUtil.consumerByType(tokens, TokenType.IDENTIFIER, IDENTIFIER);
         if (TokenUtil.testLexameBeforeConsume(tokens, EQUALS)) {
-            variableDeclaratorConsumer(tokens, scope);
+            variableDeclaratorConsumer(tokens, scope, type.getLexame().getLexame());
         } else if (TokenUtil.testLexameBeforeConsume(tokens, OPEN_BRACKET)) {
             Arrays.dimensionConsumer(tokens);
             if (TokenUtil.testLexameBeforeConsume(tokens, EQUALS)) {
@@ -107,7 +102,7 @@ public class VarDeclaration {
         }
     }
 
-    public static void variableDeclaratorConsumer(Deque<Token> tokens, SymTable scope) throws SyntaxErrorException, EOFNotExpectedException {
+    public static void variableDeclaratorConsumer(Deque<Token> tokens, SymTable scope, String type) throws SyntaxErrorException, EOFNotExpectedException {
         if (!TokenUtil.testLexameBeforeConsume(tokens, SEMICOLON) && !TokenUtil.testLexameBeforeConsume(tokens, COMMA)) {
             TokenUtil.consumerByLexame(tokens, EQUALS);
             EOFNotExpectedException.throwIfEmpty(tokens, IDENTIFIER, LOCAL, GLOBAL, REAL, INT, TRUE, FALSE);
@@ -135,7 +130,7 @@ public class VarDeclaration {
                         StructDeclaration.structUsageConsumer(tokens);
                     }
                 } else if (nextToken.thisLexameIs(OPEN_PARENTHESES.getVALUE())) {
-                    FunctionDeclaration.callFunctionConsumer(tokens, scope);
+                    FunctionDeclaration.callFunctionConsumer(tokens, scope, type);
                 } else {
                     try {
                         Expressions.fullChecker(tokens, scope);

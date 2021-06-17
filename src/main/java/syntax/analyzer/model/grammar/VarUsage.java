@@ -26,8 +26,9 @@ public class VarUsage {
         VarUsage.scope = parentScope;
 
         if (TokenUtil.testLexameBeforeConsume(tokens, EQUALS)) {
+            Identifier found = null;
             try {
-                Identifier found = parentScope.find(id);
+                found = parentScope.find(id);
                 if (found.isConstant()) {
                     ErrorManager.addNewSemanticalError(new InvalidAssignException(found, id));
                 }
@@ -35,17 +36,19 @@ public class VarUsage {
                 ex.setInfo(id);
                 ErrorManager.addNewSemanticalError(ex);
             }
-            VarDeclaration.variableDeclaratorConsumer(tokens, parentScope);
+            String type = (found == null ? "void" : found.getType());
+            VarDeclaration.variableDeclaratorConsumer(tokens, parentScope, type);
         } else if (TokenUtil.testLexameBeforeConsume(tokens, DOT)) {
+            String type = "void";
             try {
                 ComplexIdentifier found = (ComplexIdentifier) Program.GLOBAL_SCOPE.find(id);
-                StructDeclaration.structUsageConsumer(tokens, found.getSymTable());
+                type = StructDeclaration.structUsageConsumer(tokens, found.getSymTable());
             } catch (UndeclaredSymbolException ex) {
                 ex.setInfo(id);
                 ErrorManager.addNewSemanticalError(ex);
                 StructDeclaration.structUsageConsumer(tokens);
             }
-            allProductionsWithDot(tokens);
+            allProductionsWithDot(tokens, type);
         } else if (TokenUtil.testLexameBeforeConsume(tokens, OPEN_BRACKET)) {
             try {
                 parentScope.find(id);
@@ -60,13 +63,14 @@ public class VarUsage {
         }
     }
 
-    private static void allProductionsWithDot(Deque<Token> tokens) throws SyntaxErrorException, EOFNotExpectedException {
+    private static void allProductionsWithDot(Deque<Token> tokens, String type) throws SyntaxErrorException, EOFNotExpectedException {
         if (!TokenUtil.testLexameBeforeConsume(tokens, SEMICOLON)) {
             TokenUtil.consumerByLexame(tokens, EQUALS);
             try {
                 Token id = VarScope.typedVariableScoped(tokens);
                 try {
-                    scope.find(id);
+                    Identifier found = scope.find(id);
+                    found.getType();
                 } catch (UndeclaredSymbolException ex) {
                     ex.setInfo(id);
                     ErrorManager.addNewSemanticalError(ex);
@@ -83,7 +87,7 @@ public class VarUsage {
 
                 if (token.getType() == TokenType.IDENTIFIER
                         && nextToken.thisLexameIs(OPEN_PARENTHESES.getVALUE())) {
-                    FunctionDeclaration.callFunctionConsumer(tokens, scope);
+                    FunctionDeclaration.callFunctionConsumer(tokens, scope, type);
                 } else if (token.getType() == TokenType.IDENTIFIER
                         && nextToken.thisLexameIs(DOT.getVALUE())) {
                     TokenUtil.consumer(tokens);

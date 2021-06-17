@@ -7,6 +7,7 @@ import lexical.analyzer.enums.TokenType;
 import lexical.analyzer.model.Token;
 import semantic.analyzer.model.Identifiers.ComplexIdentifier;
 import static semantic.analyzer.model.Identifiers.ComplexIdentifier.loadInhereted;
+import semantic.analyzer.model.Identifiers.Identifier;
 import semantic.analyzer.model.SymTable;
 import semantic.analyzer.model.exceptions.SymbolAlreadyDeclaredException;
 import semantic.analyzer.model.exceptions.UndeclaredSymbolException;
@@ -92,14 +93,18 @@ public class StructDeclaration {
         TokenUtil.consumeExpectedTokenByType(tokens, TokenType.IDENTIFIER, Terminals.IDENTIFIER);
     }
 
-    public static void structUsageConsumer(Deque<Token> tokens, SymTable symTable) throws EOFNotExpectedException {
+    public static String structUsageConsumer(Deque<Token> tokens, SymTable symTable) throws EOFNotExpectedException {
         TokenUtil.consumer(tokens);
+        Identifier find = null;
         try {
-            symTable.find(tokens.peek());
+            find = symTable.find(tokens.peek());
         } catch (UndeclaredSymbolException ex) {
             ex.setInfo(tokens.peek());
             ErrorManager.addNewSemanticalError(ex);
         }
+        Token token = tokens.peek();
         TokenUtil.consumeExpectedTokenByType(tokens, TokenType.IDENTIFIER, Terminals.IDENTIFIER);
+
+        return find == null? "void" : find.getType();
     }
 }

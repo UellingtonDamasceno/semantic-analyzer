@@ -75,7 +75,7 @@ public class StatementDeclaration {
                 Token t2 = tokens.peek();
                 tokens.push(t1);
                 if (t2.thisLexameIs(OPEN_PARENTHESES.getVALUE())) {
-                    FunctionDeclaration.callFunctionConsumer(tokens, scope);
+                    FunctionDeclaration.callFunctionConsumer(tokens, scope, "void");
                     TokenUtil.consumeExpectedTokenByLexame(tokens, SEMICOLON);
                 } else {
                     TokenUtil.consumer(tokens);

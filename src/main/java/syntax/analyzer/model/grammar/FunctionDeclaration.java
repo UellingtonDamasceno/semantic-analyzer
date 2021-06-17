@@ -11,8 +11,10 @@ import semantic.analyzer.model.Identifiers.Identifier;
 import semantic.analyzer.model.Identifiers.IdentifierWithArguments;
 import semantic.analyzer.model.Identifiers.Procedure;
 import semantic.analyzer.model.SymTable;
+import semantic.analyzer.model.exceptions.ForbiddenCastException;
 import semantic.analyzer.model.exceptions.IncompatibleArgumentSizeException;
 import semantic.analyzer.model.exceptions.IncompatibleTypesException;
+import semantic.analyzer.model.exceptions.InvalidAssignException;
 import semantic.analyzer.model.exceptions.SymbolAlreadyDeclaredException;
 import semantic.analyzer.model.exceptions.UndeclaredSymbolException;
 import syntax.analyzer.model.exceptions.EOFNotExpectedException;
@@ -63,7 +65,6 @@ public class FunctionDeclaration {
         } catch (SymbolAlreadyDeclaredException e) {
             ErrorManager.addNewSemanticalError(e);
         }
-
         StatementDeclaration.fullChecker(tokens, scope);
     }
 
@@ -89,7 +90,7 @@ public class FunctionDeclaration {
         try {
             if (token.getType() == TokenType.IDENTIFIER
                     && nextToken.thisLexameIs(OPEN_PARENTHESES.getVALUE())) {
-                callFunctionConsumer(tokens, parent);
+                callFunctionConsumer(tokens, parent, "void");
             } else if (token.getType() == TokenType.IDENTIFIER
                     && nextToken.thisLexameIs(SEMICOLON.getVALUE())) {
                 TypeDeclaration.primaryConsumer(tokens);
@@ -108,9 +109,8 @@ public class FunctionDeclaration {
         TokenUtil.consumeExpectedTokenByLexame(tokens, SEMICOLON);
     }
 
-    public static void callFunctionConsumer(Deque<Token> tokens, SymTable currentScope) throws SyntaxErrorException, EOFNotExpectedException {
+    public static void callFunctionConsumer(Deque<Token> tokens, SymTable currentScope, String type) throws SyntaxErrorException, EOFNotExpectedException {
         Token token = tokens.peek();
-
         TokenUtil.consumer(tokens);
         TokenUtil.consumer(tokens);
         try {
@@ -124,6 +124,9 @@ public class FunctionDeclaration {
             try {
                 int hashCode = new Procedure(token, args).hashCode();
                 var found = (IdentifierWithArguments) GLOBAL_SCOPE.find(hashCode);
+                if( !type.equals("void") && !found.getType().equals(type)){
+                    ErrorManager.addNewSemanticalError(new ForbiddenCastException(token, type));
+                }
                 if (!found.validateArguments(args)) {
                     ErrorManager.addNewSemanticalError(new IncompatibleTypesException(token));
                 }
@@ -169,7 +172,8 @@ public class FunctionDeclaration {
             }
             if (token.getType() == TokenType.IDENTIFIER
                     && nextToken.thisLexameIs(OPEN_PARENTHESES.getVALUE())) {
-                callFunctionConsumer(tokens, currentScope);
+                
+                callFunctionConsumer(tokens, currentScope, TypeDeclaration.typeValidation(token));
             } else {
                 if (token.getType() != TokenType.IDENTIFIER) {
                     arguments.add(TypeDeclaration.typeValidation(tokens.peek()));

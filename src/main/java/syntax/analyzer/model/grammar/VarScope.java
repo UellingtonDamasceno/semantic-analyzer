@@ -26,8 +26,9 @@ public class VarScope {
         VarScope.scope = parentScope;
         Token id = VarScope.typedVariableScoped(tokens);
         if (TokenUtil.testLexameBeforeConsume(tokens, EQUALS)) {
+            Identifier found = null;
             try {
-                Identifier found = scope.find(id);
+                found = scope.find(id);
                 if (found.isConstant()) {
                     ErrorManager.addNewSemanticalError(new InvalidAssignException(found, id));
                 }
@@ -35,7 +36,9 @@ public class VarScope {
                 ex.setInfo(id);
                 ErrorManager.addNewSemanticalError(ex);
             }
-            allProductionsStartingWithEquals(tokens);
+            
+            String type = (found == null ? "void": found.getType());
+            allProductionsStartingWithEquals(tokens, type);
         } else {
             VarUsage.fullChecker(tokens, parentScope, id);
         }
@@ -44,6 +47,7 @@ public class VarScope {
     public static void scopeModifierConsumer(Deque<Token> tokens) throws EOFNotExpectedException, SyntaxErrorException {
         try {
             TokenUtil.consumerByLexame(tokens, GLOBAL);
+
         } catch (SyntaxErrorException e) {
             try {
                 TokenUtil.consumerByLexame(tokens, LOCAL);
@@ -61,9 +65,9 @@ public class VarScope {
         return id;
     }
 
-    private static void allProductionsStartingWithEquals(Deque<Token> tokens) throws EOFNotExpectedException, SyntaxErrorException {
+    private static void allProductionsStartingWithEquals(Deque<Token> tokens, String type) throws EOFNotExpectedException, SyntaxErrorException {
         try {
-            VarDeclaration.variableDeclaratorConsumer(tokens, scope);
+            VarDeclaration.variableDeclaratorConsumer(tokens, scope, type);
         } catch (SyntaxErrorException e) {
             EOFNotExpectedException.throwIfEmpty(tokens, DOT,
                     EQUALS,
