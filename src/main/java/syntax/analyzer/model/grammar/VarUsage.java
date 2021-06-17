@@ -83,7 +83,7 @@ public class VarUsage {
 
                 if (token.getType() == TokenType.IDENTIFIER
                         && nextToken.thisLexameIs(OPEN_PARENTHESES.getVALUE())) {
-                    FunctionDeclaration.callFunctionConsumer(tokens);
+                    FunctionDeclaration.callFunctionConsumer(tokens, scope);
                 } else if (token.getType() == TokenType.IDENTIFIER
                         && nextToken.thisLexameIs(DOT.getVALUE())) {
                     TokenUtil.consumer(tokens);

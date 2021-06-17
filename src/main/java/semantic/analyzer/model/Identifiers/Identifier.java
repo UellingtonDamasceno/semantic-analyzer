@@ -8,10 +8,12 @@ public abstract class Identifier {
 
     protected String name;
     protected boolean constant;
-
-    public Identifier(String name, boolean constant) {
+    protected String type;
+    
+    public Identifier(String name, boolean constant, String type) {
         this.name = name;
         this.constant = constant;
+        this.type = type;
     }
 
     public final String getName() {
@@ -20,6 +22,10 @@ public abstract class Identifier {
 
     public final boolean isConstant() {
         return constant;
+    }
+    
+    public String getType(){
+        return this.type;
     }
 
     @Override

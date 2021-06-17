@@ -23,7 +23,7 @@ public class ComplexIdentifier extends Identifier {
     }
 
     public ComplexIdentifier(String name, SymTable symTable, List<String> inhetedTypes) {
-        super(name, false);
+        super(name, false, inhetedTypes.get(0));
         this.symTable = symTable;
         this.inhetedTypes = inhetedTypes;
     }
@@ -34,10 +34,6 @@ public class ComplexIdentifier extends Identifier {
 
     public boolean isInstance(String parentType) {
         return inhetedTypes.contains(parentType);
-    }
-    
-    public String getType(){
-        return this.inhetedTypes.get(0);
     }
     
     public SymTable getSymTable(){

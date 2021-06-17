@@ -135,7 +135,7 @@ public class VarDeclaration {
                         StructDeclaration.structUsageConsumer(tokens);
                     }
                 } else if (nextToken.thisLexameIs(OPEN_PARENTHESES.getVALUE())) {
-                    FunctionDeclaration.callFunctionConsumer(tokens);
+                    FunctionDeclaration.callFunctionConsumer(tokens, scope);
                 } else {
                     try {
                         Expressions.fullChecker(tokens, scope);

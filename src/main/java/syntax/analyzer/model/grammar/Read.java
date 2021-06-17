@@ -1,8 +1,6 @@
 package syntax.analyzer.model.grammar;
 
 import java.util.Deque;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import lexical.analyzer.enums.TokenType;
 import lexical.analyzer.model.Token;
 import semantic.analyzer.model.Identifiers.ComplexIdentifier;

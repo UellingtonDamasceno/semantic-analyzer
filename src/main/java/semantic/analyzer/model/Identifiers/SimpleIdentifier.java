@@ -8,26 +8,14 @@ import lexical.analyzer.model.Token;
  */
 public class SimpleIdentifier extends Identifier {
 
-    private boolean inicialized;
-    private String type;
-
     public SimpleIdentifier(Token type, Token name, boolean isVariable) {
         this(type.getLexame().getLexame(), name.getLexame().getLexame(), isVariable);
     }
 
     public SimpleIdentifier(String type, String name, boolean isVariable) {
-        super(name, isVariable);
-        this.type = type;
+        super(name, isVariable, type);
     }
-
-    public boolean isInicialized() {
-        return inicialized;
-    }
-
-    public void inicialize() {
-        this.inicialized = true;
-    }
-
+    
     public boolean thisTypeIs(String type) {
         return this.type.equals(type);
     }

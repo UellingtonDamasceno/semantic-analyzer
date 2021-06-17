@@ -58,7 +58,7 @@ public class ProcedureDeclaration {
         arguments.stream().map(typedArg -> {
             Token type = typedArg.getKey();
             Token name = typedArg.getValue();
-            SimpleIdentifier id = new SimpleIdentifier(type, name, true);
+            SimpleIdentifier id = new SimpleIdentifier(type, name, false);
             return Map.entry(id, typedArg.getValue());
         }).forEach(entry -> {
             try {

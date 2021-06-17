@@ -1,3 +1,4 @@
+
 package semantic.analyzer.model.exceptions;
 
 import java.util.Arrays;
@@ -18,3 +19,4 @@ public class ForbiddenCastException extends Exception {
     }
 
 }
+

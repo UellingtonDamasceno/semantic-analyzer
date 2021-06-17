@@ -17,10 +17,10 @@ import syntax.analyzer.util.TokenUtil;
  */
 public class StatementDeclaration {
 
-    private static SymTable parentTable;
+    private static SymTable scope;
 
     public static void fullChecker(Deque<Token> tokens, SymTable parent) throws EOFNotExpectedException {
-        StatementDeclaration.parentTable = parent;
+        StatementDeclaration.scope = parent;
         TokenUtil.consumeExpectedTokenByLexame(tokens, OPEN_KEY);
         statementListChecker(tokens);
         TokenUtil.consumeExpectedTokenByLexame(tokens, CLOSE_KEY);
@@ -49,25 +49,25 @@ public class StatementDeclaration {
         Token token = tokens.peek();
         try {
             if (token.thisLexameIs(READ.getVALUE())) {
-                Read.fullChecker(tokens, parentTable);
+                Read.fullChecker(tokens, scope);
                 TokenUtil.consumeExpectedTokenByLexame(tokens, SEMICOLON);
             } else if (token.thisLexameIs(PRINT.getVALUE())) {
-                Print.fullChecker(tokens, parentTable);
+                Print.fullChecker(tokens, scope);
                 TokenUtil.consumeExpectedTokenByLexame(tokens, SEMICOLON);
             } else if (token.thisLexameIs(VAR.getVALUE())) {
-                VarDeclaration.fullChecker(tokens, parentTable);
+                VarDeclaration.fullChecker(tokens, scope);
             } else if (token.thisLexameIs(CONST.getVALUE())) {
-                ConstDeclaration.fullChecker(tokens, parentTable);
+                ConstDeclaration.fullChecker(tokens, scope);
             } else if (token.thisLexameIs(RETURN.getVALUE())) {
-                FunctionDeclaration.returnChecker(tokens);
+                FunctionDeclaration.returnChecker(tokens, scope);
             } else if (token.thisLexameIs(IF.getVALUE())) {
-                IfElse.fullChecker(tokens, parentTable);
+                IfElse.fullChecker(tokens, scope);
             } else if (token.thisLexameIs(WHILE.getVALUE())) {
-                WhileDeclaration.fullChecker(tokens, parentTable);
+                WhileDeclaration.fullChecker(tokens, scope);
             } else if (token.thisLexameIs(TYPEDEF.getVALUE())) {
                 StructDeclaration.fullChecker(tokens);
             } else if (token.thisLexameIs(GLOBAL.getVALUE()) || token.thisLexameIs(LOCAL.getVALUE())) {
-                VarScope.fullChecker(tokens, parentTable);
+                VarScope.fullChecker(tokens, scope);
                 TokenUtil.consumeExpectedTokenByLexame(tokens, SEMICOLON);
             } else if (token.getType() == TokenType.IDENTIFIER) {
                 Token t1 = tokens.pop();
@@ -75,11 +75,11 @@ public class StatementDeclaration {
                 Token t2 = tokens.peek();
                 tokens.push(t1);
                 if (t2.thisLexameIs(OPEN_PARENTHESES.getVALUE())) {
-                    FunctionDeclaration.callFunctionConsumer(tokens);
+                    FunctionDeclaration.callFunctionConsumer(tokens, scope);
                     TokenUtil.consumeExpectedTokenByLexame(tokens, SEMICOLON);
                 } else {
                     TokenUtil.consumer(tokens);
-                    VarUsage.fullChecker(tokens, parentTable, token);
+                    VarUsage.fullChecker(tokens, scope, token);
                     TokenUtil.consumeExpectedTokenByLexame(tokens, SEMICOLON);
                 }
             } else {
