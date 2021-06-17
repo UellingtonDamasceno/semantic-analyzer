@@ -28,12 +28,12 @@ public abstract class IdentifierWithArguments extends Identifier {
     }
     
     public IdentifierWithArguments(List<Entry<String, String>> args, String name) {
-        super(name);
+        super(name, true);
         this.state = new Arguments(args);
     }
     
     public IdentifierWithArguments(String name, List<String> args) {
-        super(name);
+        super(name, false);
         this.state = new ArgumentsSignature(args);
     }
     

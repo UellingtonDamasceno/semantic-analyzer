@@ -1,9 +1,14 @@
 package syntax.analyzer.model.grammar;
 
 import java.util.Deque;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import lexical.analyzer.enums.TokenType;
 import lexical.analyzer.model.Token;
 import semantic.analyzer.model.Identifiers.ComplexIdentifier;
+import semantic.analyzer.model.Identifiers.Identifier;
+import semantic.analyzer.model.SymTable;
+import semantic.analyzer.model.exceptions.InvalidAssingException;
 import semantic.analyzer.model.exceptions.UndeclaredSymbolException;
 import syntax.analyzer.model.exceptions.EOFNotExpectedException;
 import syntax.analyzer.util.ErrorManager;
@@ -17,7 +22,10 @@ import syntax.analyzer.util.TokenUtil;
  */
 public class Read {
 
-    public static void fullChecker(Deque<Token> tokens) throws EOFNotExpectedException {
+    private static SymTable scope;
+
+    public static void fullChecker(Deque<Token> tokens, SymTable scope) throws EOFNotExpectedException {
+        Read.scope = scope;
         TokenUtil.consumer(tokens);
         TokenUtil.consumeExpectedTokenByLexame(tokens, OPEN_PARENTHESES);
         if (TokenUtil.testLexameBeforeConsume(tokens, CLOSE_PARENTHESES)) {
@@ -33,6 +41,15 @@ public class Read {
 
     public static void expressionReadConsumer(Deque<Token> tokens) throws EOFNotExpectedException {
         Token token = tokens.peek();
+        try {
+            Identifier found = scope.find(token);
+            if (found.isConstant()) {
+                ErrorManager.addNewSemanticalError(new InvalidAssingException(found, token));
+            }
+        } catch (UndeclaredSymbolException ex) {
+            ex.setInfo(token);
+            ErrorManager.addNewSemanticalError(ex);
+        }
         TokenUtil.consumeExpectedTokenByType(tokens, TokenType.IDENTIFIER, Terminals.IDENTIFIER);
         if (!TokenUtil.testLexameBeforeConsume(tokens, CLOSE_PARENTHESES)
                 && !TokenUtil.testLexameBeforeConsume(tokens, COMMA)

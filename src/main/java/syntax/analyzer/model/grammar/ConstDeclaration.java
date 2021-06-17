@@ -75,7 +75,7 @@ public class ConstDeclaration {
     }
 
     public static void constDeclarator(Deque<Token> tokens) throws SyntaxErrorException, EOFNotExpectedException {
-        SimpleIdentifier id = new SimpleIdentifier(currentType, tokens.peek(), false);
+        SimpleIdentifier id = new SimpleIdentifier(currentType, tokens.peek(), true);
         try {
             table.insert(id, tokens.peek());
         } catch (SymbolAlreadyDeclaredException ex) {

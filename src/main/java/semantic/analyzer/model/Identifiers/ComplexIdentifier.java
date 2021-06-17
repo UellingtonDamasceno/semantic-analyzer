@@ -23,7 +23,7 @@ public class ComplexIdentifier extends Identifier {
     }
 
     public ComplexIdentifier(String name, SymTable symTable, List<String> inhetedTypes) {
-        super(name);
+        super(name, false);
         this.symTable = symTable;
         this.inhetedTypes = inhetedTypes;
     }

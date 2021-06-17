@@ -77,7 +77,7 @@ public class VarDeclaration {
 
     public static void variableConsumer(Deque<Token> tokens) throws SyntaxErrorException, EOFNotExpectedException {
         try {
-            scope.insert(new SimpleIdentifier(currentType, tokens.peek(), true), tokens.peek());
+            scope.insert(new SimpleIdentifier(currentType, tokens.peek(), false), tokens.peek());
         } catch (SymbolAlreadyDeclaredException ex) {
             ErrorManager.addNewSemanticalError(ex);
         }

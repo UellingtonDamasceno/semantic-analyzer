@@ -8,7 +8,6 @@ import lexical.analyzer.model.Token;
  */
 public class SimpleIdentifier extends Identifier {
 
-    private boolean variable;
     private boolean inicialized;
     private String type;
 
@@ -17,9 +16,8 @@ public class SimpleIdentifier extends Identifier {
     }
 
     public SimpleIdentifier(String type, String name, boolean isVariable) {
-        super(name);
+        super(name, isVariable);
         this.type = type;
-        this.variable = isVariable;
     }
 
     public boolean isInicialized() {
@@ -28,10 +26,6 @@ public class SimpleIdentifier extends Identifier {
 
     public void inicialize() {
         this.inicialized = true;
-    }
-
-    public boolean isVariable() {
-        return variable;
     }
 
     public boolean thisTypeIs(String type) {

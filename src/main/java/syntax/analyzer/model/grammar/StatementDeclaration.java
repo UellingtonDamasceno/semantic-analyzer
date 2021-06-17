@@ -49,7 +49,7 @@ public class StatementDeclaration {
         Token token = tokens.peek();
         try {
             if (token.thisLexameIs(READ.getVALUE())) {
-                Read.fullChecker(tokens);
+                Read.fullChecker(tokens, parentTable);
                 TokenUtil.consumeExpectedTokenByLexame(tokens, SEMICOLON);
             } else if (token.thisLexameIs(PRINT.getVALUE())) {
                 Print.fullChecker(tokens, parentTable);
