@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import lexical.analyzer.model.Token;
 import semantic.analyzer.model.exceptions.IncompatibleArgumentSizeException;
 import semantic.analyzer.model.exceptions.IncompatibleTypesException;
 
@@ -72,6 +72,11 @@ public class Arguments implements ArgumentsState<String> {
             return it1.next().equals(strNext) ? isValidParams(it1, it2) : false;
         }
         return true;
+    }
+
+    @Override
+    public List<String> getTypes() {
+        return arguments.stream().map(Entry::getKey).collect(toList());
     }
 
 }

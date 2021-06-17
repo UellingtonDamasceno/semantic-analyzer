@@ -41,6 +41,10 @@ public abstract class IdentifierWithArguments extends Identifier {
     public void transition(List<Entry<String, String>> args) {
         this.state = this.state.changeState(args);
     }
+    
+    public List<String> getArguments(){
+        return state.getTypes();
+    }
 
     public boolean validateArguments(List<String> arguments) throws IncompatibleArgumentSizeException, IncompatibleTypesException {
         return state.validateArguments(arguments);

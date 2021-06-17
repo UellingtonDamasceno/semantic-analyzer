@@ -137,7 +137,6 @@ public class FunctionDeclaration {
                 ErrorManager.addNewSemanticalError(ex1);
             }
         }
-
     }
 
     public static void argsListConsumer(Deque<Token> tokens, List<String> arguments, SymTable currentScope) throws SyntaxErrorException, EOFNotExpectedException {
@@ -172,6 +171,9 @@ public class FunctionDeclaration {
                     && nextToken.thisLexameIs(OPEN_PARENTHESES.getVALUE())) {
                 callFunctionConsumer(tokens, currentScope);
             } else {
+                if (token.getType() != TokenType.IDENTIFIER) {
+                    arguments.add(TypeDeclaration.typeValidation(tokens.peek()));
+                }
                 TypeDeclaration.primaryConsumer(tokens);
             }
         } else {

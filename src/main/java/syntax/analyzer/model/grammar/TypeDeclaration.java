@@ -18,7 +18,6 @@ import syntax.analyzer.util.TokenUtil;
  */
 public class TypeDeclaration {
 
-    public static final String UNKNOWN = "unknown";
 
     private static final List<TokenType> tokenTypes = List.of(
             TokenType.IDENTIFIER,
@@ -68,7 +67,6 @@ public class TypeDeclaration {
         return token.thisLexameIs(REAL.getVALUE()) || token.thisLexameIs(INT.getVALUE());
     }
 
-    
     public static void literalConsumer(Deque<Token> tokens) throws EOFNotExpectedException, SyntaxErrorException {
         EOFNotExpectedException.throwIfEmpty(tokens, TRUE, FALSE, REAL, INT, STRING);
         Token token = tokens.peek();
@@ -80,17 +78,31 @@ public class TypeDeclaration {
         }
         TokenUtil.consumer(tokens);
     }
-    
+
     public static void typeValidation(Token type, Token toValidate) {
         if (type.thisLexameIs(BOOLEAN.getVALUE())
                 && !(toValidate.thisLexameIs(TRUE.getVALUE()) || toValidate.thisLexameIs(FALSE.getVALUE()))) {
             ErrorManager.addNewSemanticalError(new ForbiddenCastException(toValidate, BOOLEAN.getVALUE()));
-        } else if ((type.thisLexameIs(INT.getVALUE()) || type.thisLexameIs(REAL.getVALUE()))
+        } else if ((scalarChecker(type))
                 && !(toValidate.getType() == TokenType.NUMBER)) {
             ErrorManager.addNewSemanticalError(new ForbiddenCastException(toValidate, INT.getVALUE(), REAL.getVALUE()));
         } else if (type.thisLexameIs(STRING.getVALUE())
                 && !(toValidate.getType() == TokenType.STRING)) {
             ErrorManager.addNewSemanticalError(new ForbiddenCastException(toValidate, STRING.getVALUE()));
+        }
+    }
+
+    public static String typeValidation(Token token) {
+        String value = token.getLexame().getLexame();
+        
+        if (token.getType() == TokenType.STRING) {
+            return STRING.getVALUE();
+        } else if (token.getType() == TokenType.NUMBER) {
+            return value.contains(".") ? REAL.getVALUE() : INT.getVALUE();
+        } else if (token.thisLexameIs(TRUE.getVALUE()) || token.thisLexameIs(FALSE.getVALUE())) {
+            return BOOLEAN.getVALUE();
+        }else{
+            return value;
         }
     }
 

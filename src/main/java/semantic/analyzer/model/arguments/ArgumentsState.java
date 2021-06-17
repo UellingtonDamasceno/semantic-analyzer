@@ -20,4 +20,6 @@ public interface ArgumentsState<T> {
     public ArgumentsState<T> changeState(List<Entry<T, T>> args);
 
     public boolean validateArguments(List<String> arguments) throws IncompatibleArgumentSizeException, IncompatibleTypesException;
+    
+    public List<String> getTypes();
 }

@@ -10,7 +10,7 @@ import static java.util.stream.Collectors.toMap;
 
 /**
  *
- * @author acmne
+ * @author Antonio Neto e Uellington Damasceno
  */
 public class ArgumentsSignature implements ArgumentsState<String> {
 
@@ -55,7 +55,7 @@ public class ArgumentsSignature implements ArgumentsState<String> {
                 .stream()
                 .collect(toList()));
     }
-    
+
     private boolean isValidParams(List<Entry<String, String>> args) {
         return isValidParams(args.iterator(), arguments.iterator());
     }
@@ -67,6 +67,11 @@ public class ArgumentsSignature implements ArgumentsState<String> {
             return next.equals(nextMain) ? isValidParams(it1, it2) : false;
         }
         return true;
+    }
+
+    @Override
+    public List<String> getTypes() {
+        return arguments;
     }
 
 }
