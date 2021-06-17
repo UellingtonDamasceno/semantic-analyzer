@@ -4,9 +4,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import semantic.analyzer.model.exceptions.IncompatibleArgumentSizeException;
-import semantic.analyzer.model.exceptions.IncompatibleTypesException;
-import syntax.analyzer.util.ErrorManager;
+import java.util.function.Function;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 /**
  *
@@ -38,15 +38,24 @@ public class ArgumentsSignature implements ArgumentsState<String> {
     //TODO factory
     @Override
     public ArgumentsState<String> changeState(List<Map.Entry<String, String>> args) {
-        if (args.size() != arguments.size()) {
-            ErrorManager.addNewSemanticalError(new IncompatibleArgumentSizeException("Tamanhos incompatíveis"));
-        }
-        if (!isValidParams(args)) {
-            ErrorManager.addNewSemanticalError(new IncompatibleTypesException("Tipos incompatíveis"));
-        }
+//        if (args.size() != arguments.size()) {
+//            ErrorManager.addNewSemanticalError(new IncompatibleArgumentSizeException("Tamanhos incompatíveis"));
+//        }
+//        if (!isValidParams(args)) {
+//            ErrorManager.addNewSemanticalError(new IncompatibleTypesException());
+//        }
         return new Arguments(args);
     }
 
+    @Override
+    public boolean validateArguments(List<String> arguments) {
+        return isValidParams(arguments.stream()
+                .collect(toMap(Function.identity(), Function.identity()))
+                .entrySet()
+                .stream()
+                .collect(toList()));
+    }
+    
     private boolean isValidParams(List<Entry<String, String>> args) {
         return isValidParams(args.iterator(), arguments.iterator());
     }
@@ -59,4 +68,5 @@ public class ArgumentsSignature implements ArgumentsState<String> {
         }
         return true;
     }
+
 }

@@ -3,7 +3,9 @@ package syntax.analyzer.model.grammar;
 import java.util.Deque;
 import lexical.analyzer.enums.TokenType;
 import lexical.analyzer.model.Token;
+import semantic.analyzer.model.Identifiers.Identifier;
 import semantic.analyzer.model.SymTable;
+import semantic.analyzer.model.exceptions.InvalidAssignException;
 import semantic.analyzer.model.exceptions.UndeclaredSymbolException;
 import syntax.analyzer.model.exceptions.EOFNotExpectedException;
 import syntax.analyzer.model.exceptions.SyntaxErrorException;
@@ -18,12 +20,21 @@ import static syntax.analyzer.util.Terminals.*;
  */
 public class VarScope {
 
-    private static SymTable parentScope;
+    private static SymTable scope;
 
     public static void fullChecker(Deque<Token> tokens, SymTable parentScope) throws EOFNotExpectedException, SyntaxErrorException {
-        VarScope.parentScope = parentScope;
+        VarScope.scope = parentScope;
         Token id = VarScope.typedVariableScoped(tokens);
         if (TokenUtil.testLexameBeforeConsume(tokens, EQUALS)) {
+            try {
+                Identifier found = scope.find(id);
+                if (found.isConstant()) {
+                    ErrorManager.addNewSemanticalError(new InvalidAssignException(found, id));
+                }
+            } catch (UndeclaredSymbolException ex) {
+                ex.setInfo(id);
+                ErrorManager.addNewSemanticalError(ex);
+            }
             allProductionsStartingWithEquals(tokens);
         } else {
             VarUsage.fullChecker(tokens, parentScope, id);
@@ -52,7 +63,7 @@ public class VarScope {
 
     private static void allProductionsStartingWithEquals(Deque<Token> tokens) throws EOFNotExpectedException, SyntaxErrorException {
         try {
-            VarDeclaration.variableDeclaratorConsumer(tokens, parentScope);
+            VarDeclaration.variableDeclaratorConsumer(tokens, scope);
         } catch (SyntaxErrorException e) {
             EOFNotExpectedException.throwIfEmpty(tokens, DOT,
                     EQUALS,
@@ -82,30 +93,28 @@ public class VarScope {
                 try {
                     Token id = VarScope.typedVariableScoped(tokens);
                     try {
-                        parentScope.find(id);
+                        scope.find(id);
                     } catch (UndeclaredSymbolException exx) {
                         exx.setInfo(id);
                         ErrorManager.addNewSemanticalError(exx);
                     }
                     if (TokenUtil.testLexameBeforeConsume(tokens, OPEN_BRACKET)) {
-                        System.out.println("Entrou aqui00");
                         Arrays.dimensionConsumer(tokens);
                     }
                 } catch (SyntaxErrorException ex) {
                     try {
-                        parentScope.find(tokens.peek());
+                        scope.find(tokens.peek());
                     } catch (UndeclaredSymbolException exx) {
                         exx.setInfo(tokens.peek());
                         ErrorManager.addNewSemanticalError(exx);
                     }
                     TokenUtil.consumerByType(tokens, TokenType.IDENTIFIER, Terminals.IDENTIFIER);
                     if (TokenUtil.testLexameBeforeConsume(tokens, OPEN_BRACKET)) {
-                        System.out.println("Entrou aqui01");
                         Arrays.dimensionConsumer(tokens);
                     }
                 }
             } else {
-                VarUsage.fullChecker(tokens, parentScope, nextToken);
+                VarUsage.fullChecker(tokens, scope, nextToken);
             }
         }
     }

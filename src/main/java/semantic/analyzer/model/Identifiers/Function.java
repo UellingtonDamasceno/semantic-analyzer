@@ -12,8 +12,6 @@ import lexical.analyzer.model.Token;
  */
 public class Function extends IdentifierWithArguments {
 
-    private final String typeReturn;
-
     public Function(Token identifier, Token typeReturn, List<Entry<Token, Token>> args) {
         this(identifier.getLexame().getLexame(),
                 typeReturn.getLexame().getLexame(),
@@ -25,12 +23,11 @@ public class Function extends IdentifierWithArguments {
     }
 
     public Function(String identifier, String typeReturn, List<Entry<String, String>> args) {
-        super(args, identifier);
-        this.typeReturn = typeReturn;
+        super(args, identifier, typeReturn);
     }
-
+    
     public boolean returnTypeIs(String type) {
-        return this.typeReturn.equals(type);
+        return this.type.equals(type);
     }
 
     @Override

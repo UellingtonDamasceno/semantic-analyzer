@@ -4,7 +4,9 @@ import java.util.Deque;
 import lexical.analyzer.enums.TokenType;
 import lexical.analyzer.model.Token;
 import semantic.analyzer.model.Identifiers.ComplexIdentifier;
+import semantic.analyzer.model.Identifiers.Identifier;
 import semantic.analyzer.model.SymTable;
+import semantic.analyzer.model.exceptions.InvalidAssignException;
 import semantic.analyzer.model.exceptions.UndeclaredSymbolException;
 import syntax.analyzer.model.exceptions.EOFNotExpectedException;
 import syntax.analyzer.model.exceptions.SyntaxErrorException;
@@ -18,14 +20,17 @@ import static syntax.analyzer.util.Terminals.*;
  */
 public class VarUsage {
 
-    private static SymTable parentScope;
+    private static SymTable scope;
 
     public static void fullChecker(Deque<Token> tokens, SymTable parentScope, Token id) throws EOFNotExpectedException, SyntaxErrorException {
-        VarUsage.parentScope = parentScope;
+        VarUsage.scope = parentScope;
 
         if (TokenUtil.testLexameBeforeConsume(tokens, EQUALS)) {
             try {
-                parentScope.find(id);
+                Identifier found = parentScope.find(id);
+                if (found.isConstant()) {
+                    ErrorManager.addNewSemanticalError(new InvalidAssignException(found, id));
+                }
             } catch (UndeclaredSymbolException ex) {
                 ex.setInfo(id);
                 ErrorManager.addNewSemanticalError(ex);
@@ -61,13 +66,13 @@ public class VarUsage {
             try {
                 Token id = VarScope.typedVariableScoped(tokens);
                 try {
-                    parentScope.find(id);
+                    scope.find(id);
                 } catch (UndeclaredSymbolException ex) {
                     ex.setInfo(id);
                     ErrorManager.addNewSemanticalError(ex);
                 }
                 if (TokenUtil.testLexameBeforeConsume(tokens, DOT)) {
-                    StructDeclaration.structUsageConsumer(tokens, parentScope);
+                    StructDeclaration.structUsageConsumer(tokens, scope);
                 }
             } catch (SyntaxErrorException e1) {
                 EOFNotExpectedException.throwIfEmpty(tokens, IDENTIFIER);
@@ -78,7 +83,7 @@ public class VarUsage {
 
                 if (token.getType() == TokenType.IDENTIFIER
                         && nextToken.thisLexameIs(OPEN_PARENTHESES.getVALUE())) {
-                    FunctionDeclaration.callFunctionConsumer(tokens);
+                    FunctionDeclaration.callFunctionConsumer(tokens, scope);
                 } else if (token.getType() == TokenType.IDENTIFIER
                         && nextToken.thisLexameIs(DOT.getVALUE())) {
                     TokenUtil.consumer(tokens);
@@ -95,7 +100,7 @@ public class VarUsage {
                     TokenUtil.consumer(tokens);
                     Arrays.dimensionConsumer(tokens);
                 } else {
-                    Expressions.fullChecker(tokens, parentScope);
+                    Expressions.fullChecker(tokens, scope);
                 }
             }
         }
@@ -109,7 +114,7 @@ public class VarUsage {
             try {
                 Token id = VarScope.typedVariableScoped(tokens);
                 if (TokenUtil.testLexameBeforeConsume(tokens, DOT)) {
-                    StructDeclaration.structUsageConsumer(tokens, parentScope);
+                    StructDeclaration.structUsageConsumer(tokens, scope);
                 } else if (TokenUtil.testLexameBeforeConsume(tokens, OPEN_BRACKET)) {
                     Arrays.dimensionConsumer(tokens);
                 }
@@ -134,7 +139,7 @@ public class VarUsage {
                         && nextToken.thisLexameIs(OPEN_BRACKET.getVALUE())) {
                     TokenUtil.consumer(tokens);
                     try {
-                        parentScope.find(token);
+                        scope.find(token);
                     } catch (UndeclaredSymbolException ex) {
                         ex.setInfo(token);
                         ErrorManager.addNewSemanticalError(ex);
@@ -142,7 +147,7 @@ public class VarUsage {
                     Arrays.dimensionConsumer(tokens);
                 } else if (TypeDeclaration.primaryChecker(token)) {
                     try {
-                        parentScope.find(token);
+                        scope.find(token);
                     } catch (UndeclaredSymbolException ex) {
                         ex.setInfo(token);
                         ErrorManager.addNewSemanticalError(ex);
