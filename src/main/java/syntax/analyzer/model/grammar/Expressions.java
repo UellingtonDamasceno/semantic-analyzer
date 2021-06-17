@@ -3,8 +3,11 @@ package syntax.analyzer.model.grammar;
 import java.util.Deque;
 import lexical.analyzer.enums.TokenType;
 import lexical.analyzer.model.Token;
+import semantic.analyzer.model.SymTable;
+import semantic.analyzer.model.exceptions.UndeclaredSymbolException;
 import syntax.analyzer.model.exceptions.EOFNotExpectedException;
 import syntax.analyzer.model.exceptions.SyntaxErrorException;
+import syntax.analyzer.util.ErrorManager;
 import static syntax.analyzer.util.Terminals.*;
 import syntax.analyzer.util.TokenUtil;
 
@@ -14,7 +17,10 @@ import syntax.analyzer.util.TokenUtil;
  */
 public class Expressions {
 
-    public static void fullChecker(Deque<Token> tokens) throws SyntaxErrorException, EOFNotExpectedException {
+    private static SymTable scope;
+
+    public static void fullChecker(Deque<Token> tokens, SymTable scope) throws SyntaxErrorException, EOFNotExpectedException {
+        Expressions.scope = scope;
         orExpressionConsumer(tokens);
     }
 
@@ -78,7 +84,7 @@ public class Expressions {
             } else if (token.thisLexameIs(MINUS.getVALUE())) {
                 TokenUtil.consumerByLexame(tokens, MINUS);
                 addExpression(tokens);
-            } 
+            }
         }
     }
 
@@ -110,11 +116,20 @@ public class Expressions {
             Token token = tokens.peek();
             if (token.thisLexameIs(OPEN_PARENTHESES.getVALUE())) {
                 TokenUtil.consumerByLexame(tokens, OPEN_PARENTHESES);
-                fullChecker(tokens);
+                fullChecker(tokens, scope);
                 TokenUtil.consumerByLexame(tokens, CLOSE_PARENTHESES);
             } else {
                 try {
+                    Token id = tokens.peek();
                     TypeDeclaration.primaryConsumer(tokens);
+                    if (id.getType() == TokenType.IDENTIFIER) {
+                        try {
+                            scope.find(id);
+                        } catch (UndeclaredSymbolException ex) {
+                            ex.setInfo(id);
+                            ErrorManager.addNewSemanticalError(ex);
+                        }
+                    }
                 } catch (SyntaxErrorException e) {
                     throw new SyntaxErrorException(token.getLexame(),
                             IDENTIFIER,

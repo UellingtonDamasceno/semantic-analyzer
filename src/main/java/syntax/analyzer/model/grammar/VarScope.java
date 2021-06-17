@@ -4,8 +4,10 @@ import java.util.Deque;
 import lexical.analyzer.enums.TokenType;
 import lexical.analyzer.model.Token;
 import semantic.analyzer.model.SymTable;
+import semantic.analyzer.model.exceptions.UndeclaredSymbolException;
 import syntax.analyzer.model.exceptions.EOFNotExpectedException;
 import syntax.analyzer.model.exceptions.SyntaxErrorException;
+import syntax.analyzer.util.ErrorManager;
 import syntax.analyzer.util.TokenUtil;
 import syntax.analyzer.util.Terminals;
 import static syntax.analyzer.util.Terminals.*;
@@ -20,11 +22,11 @@ public class VarScope {
 
     public static void fullChecker(Deque<Token> tokens, SymTable parentScope) throws EOFNotExpectedException, SyntaxErrorException {
         VarScope.parentScope = parentScope;
-        typedVariableScoped(tokens);
+        Token id = VarScope.typedVariableScoped(tokens);
         if (TokenUtil.testLexameBeforeConsume(tokens, EQUALS)) {
             allProductionsStartingWithEquals(tokens);
         } else {
-            VarUsage.fullChecker(tokens, parentScope);
+            VarUsage.fullChecker(tokens, parentScope, id);
         }
     }
 
@@ -41,15 +43,17 @@ public class VarScope {
         }
     }
 
-    public static void typedVariableScoped(Deque<Token> tokens) throws EOFNotExpectedException, SyntaxErrorException {
+    public static Token typedVariableScoped(Deque<Token> tokens) throws EOFNotExpectedException, SyntaxErrorException {
         VarScope.scopeModifierConsumer(tokens);
         TokenUtil.consumeExpectedTokenByLexame(tokens, DOT);
+        Token id = tokens.peek();
         TokenUtil.consumerByType(tokens, TokenType.IDENTIFIER, Terminals.IDENTIFIER);
+        return id;
     }
 
     private static void allProductionsStartingWithEquals(Deque<Token> tokens) throws EOFNotExpectedException, SyntaxErrorException {
         try {
-            VarDeclaration.variableDeclaratorConsumer(tokens);
+            VarDeclaration.variableDeclaratorConsumer(tokens, parentScope);
         } catch (SyntaxErrorException e) {
             EOFNotExpectedException.throwIfEmpty(tokens, DOT,
                     EQUALS,
@@ -77,18 +81,31 @@ public class VarScope {
                     || nextNextToken.thisLexameIs(OPEN_BRACKET.getVALUE())) {
                 TokenUtil.consumeExpectedTokenByLexame(tokens, EQUALS);
                 try {
-                    VarScope.scopeModifierConsumer(tokens);
+                    Token id = VarScope.typedVariableScoped(tokens);
+                    try {
+                        parentScope.find(id);
+                    } catch (UndeclaredSymbolException exx) {
+                        exx.setInfo(id);
+                        ErrorManager.addNewSemanticalError(exx);
+                    }
+
                     if (TokenUtil.testLexameBeforeConsume(tokens, OPEN_BRACKET)) {
                         Arrays.dimensionConsumer(tokens);
                     }
                 } catch (SyntaxErrorException ex) {
+                    try {
+                        parentScope.find(tokens.peek());
+                    } catch (UndeclaredSymbolException exx) {
+                        exx.setInfo(tokens.peek());
+                        ErrorManager.addNewSemanticalError(exx);
+                    }
                     TokenUtil.consumerByType(tokens, TokenType.IDENTIFIER, Terminals.IDENTIFIER);
                     if (TokenUtil.testLexameBeforeConsume(tokens, OPEN_BRACKET)) {
                         Arrays.dimensionConsumer(tokens);
                     }
                 }
             } else {
-                VarUsage.fullChecker(tokens, parentScope);
+                VarUsage.fullChecker(tokens, parentScope, nextToken);
             }
         }
     }

@@ -21,11 +21,11 @@ import syntax.analyzer.util.TokenUtil;
  */
 public class VarDeclaration {
 
-    private static SymTable table;
+    private static SymTable scope;
     private static Token currentType;
 
     public static void fullChecker(Deque<Token> tokens, SymTable parent) throws EOFNotExpectedException {
-        table = parent;
+        scope = parent;
         TokenUtil.consumer(tokens);
         TokenUtil.consumeExpectedTokenByLexame(tokens, OPEN_KEY);
 
@@ -77,14 +77,14 @@ public class VarDeclaration {
 
     public static void variableConsumer(Deque<Token> tokens) throws SyntaxErrorException, EOFNotExpectedException {
         try {
-            table.insert(new SimpleIdentifier(currentType, tokens.peek(), true), tokens.peek());
+            scope.insert(new SimpleIdentifier(currentType, tokens.peek(), true), tokens.peek());
         } catch (SymbolAlreadyDeclaredException ex) {
             ErrorManager.addNewSemanticalError(ex);
         }
 
         TokenUtil.consumerByType(tokens, TokenType.IDENTIFIER, IDENTIFIER);
         if (TokenUtil.testLexameBeforeConsume(tokens, EQUALS)) {
-            variableDeclaratorConsumer(tokens);
+            variableDeclaratorConsumer(tokens, scope);
         } else if (TokenUtil.testLexameBeforeConsume(tokens, OPEN_BRACKET)) {
             Arrays.dimensionConsumer(tokens);
             if (TokenUtil.testLexameBeforeConsume(tokens, EQUALS)) {
@@ -103,7 +103,7 @@ public class VarDeclaration {
         }
     }
 
-    public static void variableDeclaratorConsumer(Deque<Token> tokens) throws SyntaxErrorException, EOFNotExpectedException {
+    public static void variableDeclaratorConsumer(Deque<Token> tokens, SymTable scope) throws SyntaxErrorException, EOFNotExpectedException {
         if (!TokenUtil.testLexameBeforeConsume(tokens, SEMICOLON) && !TokenUtil.testLexameBeforeConsume(tokens, COMMA)) {
             TokenUtil.consumerByLexame(tokens, EQUALS);
             EOFNotExpectedException.throwIfEmpty(tokens, IDENTIFIER, LOCAL, GLOBAL, REAL, INT, TRUE, FALSE);
@@ -120,7 +120,7 @@ public class VarDeclaration {
                 tokens.push(token);
                 if (token.thisLexameIs(GLOBAL.getVALUE())
                         || token.thisLexameIs(LOCAL.getVALUE())) {
-                    VarScope.typedVariableScoped(tokens);
+                    Token id = VarScope.typedVariableScoped(tokens);
                 } else if (nextToken.thisLexameIs(DOT.getVALUE())) {
                     TokenUtil.consumer(tokens);
                     try {
@@ -135,7 +135,7 @@ public class VarDeclaration {
                     FunctionDeclaration.callFunctionConsumer(tokens);
                 } else {
                     try {
-                        Expressions.fullChecker(tokens);
+                        Expressions.fullChecker(tokens, scope);
                     } catch (SyntaxErrorException e1) {
                         throw new SyntaxErrorException(tokens.peek().getLexame(),
                                 DOT, GLOBAL, LOCAL, OPEN_PARENTHESES, EXPRESSION);

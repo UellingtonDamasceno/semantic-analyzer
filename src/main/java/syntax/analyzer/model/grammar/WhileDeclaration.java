@@ -13,9 +13,9 @@ import syntax.analyzer.util.TokenUtil;
  */
 public class WhileDeclaration {
 
-    public static void fullChecker(Deque<Token> tokens, SymTable parent) throws SyntaxErrorException, EOFNotExpectedException {
+    public static void fullChecker(Deque<Token> tokens, SymTable scope) throws SyntaxErrorException, EOFNotExpectedException {
         TokenUtil.consumer(tokens);
-        Expressions.fullChecker(tokens);
+        Expressions.fullChecker(tokens, scope);
         StatementDeclaration.fullChecker(tokens, new SymTable());
     }
 

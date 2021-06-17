@@ -79,7 +79,7 @@ public class StatementDeclaration {
                     TokenUtil.consumeExpectedTokenByLexame(tokens, SEMICOLON);
                 } else {
                     TokenUtil.consumer(tokens);
-                    VarUsage.fullChecker(tokens, parentTable);
+                    VarUsage.fullChecker(tokens, parentTable, token);
                     TokenUtil.consumeExpectedTokenByLexame(tokens, SEMICOLON);
                 }
             } else {

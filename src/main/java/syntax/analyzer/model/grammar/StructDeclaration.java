@@ -7,8 +7,6 @@ import lexical.analyzer.enums.TokenType;
 import lexical.analyzer.model.Token;
 import semantic.analyzer.model.Identifiers.ComplexIdentifier;
 import static semantic.analyzer.model.Identifiers.ComplexIdentifier.loadInhereted;
-import semantic.analyzer.model.Identifiers.Identifier;
-import semantic.analyzer.model.Identifiers.SimpleIdentifier;
 import semantic.analyzer.model.SymTable;
 import semantic.analyzer.model.exceptions.SymbolAlreadyDeclaredException;
 import semantic.analyzer.model.exceptions.UndeclaredSymbolException;

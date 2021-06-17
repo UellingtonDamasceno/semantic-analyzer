@@ -10,7 +10,6 @@ import syntax.analyzer.model.exceptions.EOFNotExpectedException;
 import syntax.analyzer.model.exceptions.SyntaxErrorException;
 import syntax.analyzer.util.ErrorManager;
 import syntax.analyzer.util.TokenUtil;
-import syntax.analyzer.util.Terminals;
 import static syntax.analyzer.util.Terminals.*;
 
 /**
@@ -21,13 +20,34 @@ public class VarUsage {
 
     private static SymTable parentScope;
 
-    public static void fullChecker(Deque<Token> tokens, SymTable parentScope) throws EOFNotExpectedException, SyntaxErrorException {
+    public static void fullChecker(Deque<Token> tokens, SymTable parentScope, Token id) throws EOFNotExpectedException, SyntaxErrorException {
         VarUsage.parentScope = parentScope;
+
         if (TokenUtil.testLexameBeforeConsume(tokens, EQUALS)) {
-            VarDeclaration.variableDeclaratorConsumer(tokens);
+            try {
+                parentScope.find(id);
+            } catch (UndeclaredSymbolException ex) {
+                ex.setInfo(id);
+                ErrorManager.addNewSemanticalError(ex);
+            }
+            VarDeclaration.variableDeclaratorConsumer(tokens, parentScope);
         } else if (TokenUtil.testLexameBeforeConsume(tokens, DOT)) {
+            try {
+                ComplexIdentifier found = (ComplexIdentifier) Program.GLOBAL_SCOPE.find(id);
+                StructDeclaration.structUsageConsumer(tokens, found.getSymTable());
+            } catch (UndeclaredSymbolException ex) {
+                ex.setInfo(id);
+                ErrorManager.addNewSemanticalError(ex);
+                StructDeclaration.structUsageConsumer(tokens);
+            }
             allProductionsWithDot(tokens);
         } else if (TokenUtil.testLexameBeforeConsume(tokens, OPEN_BRACKET)) {
+            try {
+                parentScope.find(id);
+            } catch (UndeclaredSymbolException ex) {
+                ex.setInfo(id);
+                ErrorManager.addNewSemanticalError(ex);
+            }
             allProductionsWithBracket(tokens);
         } else {
             throw new SyntaxErrorException(tokens.peek().getLexame(), EQUALS, DOT, OPEN_BRACKET);
@@ -35,12 +55,17 @@ public class VarUsage {
     }
 
     private static void allProductionsWithDot(Deque<Token> tokens) throws SyntaxErrorException, EOFNotExpectedException {
-        TokenUtil.consumer(tokens);
-        TokenUtil.consumerByType(tokens, TokenType.IDENTIFIER, Terminals.IDENTIFIER);
         if (!TokenUtil.testLexameBeforeConsume(tokens, SEMICOLON)) {
             TokenUtil.consumerByLexame(tokens, EQUALS);
             try {
-                VarScope.typedVariableScoped(tokens);
+                Token id = VarScope.typedVariableScoped(tokens);
+                ComplexIdentifier found = null;
+                try {
+                    found = (ComplexIdentifier) parentScope.find(id);
+                } catch (UndeclaredSymbolException ex) {
+                    ex.setInfo(id);
+                    ErrorManager.addNewSemanticalError(ex);
+                }
                 if (TokenUtil.testLexameBeforeConsume(tokens, DOT)) {
                     StructDeclaration.structUsageConsumer(tokens, parentScope);
                 }
@@ -70,7 +95,7 @@ public class VarUsage {
                     TokenUtil.consumer(tokens);
                     Arrays.dimensionConsumer(tokens);
                 } else {
-                    Expressions.fullChecker(tokens);
+                    Expressions.fullChecker(tokens, parentScope);
                 }
             }
         }
@@ -107,8 +132,20 @@ public class VarUsage {
                 } else if (token.getType() == TokenType.IDENTIFIER
                         && nextToken.thisLexameIs(OPEN_BRACKET.getVALUE())) {
                     TokenUtil.consumer(tokens);
+                    try {
+                        parentScope.find(token);
+                    } catch (UndeclaredSymbolException ex) {
+                        ex.setInfo(token);
+                        ErrorManager.addNewSemanticalError(ex);
+                    }
                     Arrays.dimensionConsumer(tokens);
                 } else if (TypeDeclaration.primaryChecker(token)) {
+                    try {
+                        parentScope.find(token);
+                    } catch (UndeclaredSymbolException ex) {
+                        ex.setInfo(token);
+                        ErrorManager.addNewSemanticalError(ex);
+                    }
                     TypeDeclaration.primaryConsumer(tokens);
                 } else if (TokenUtil.testLexameBeforeConsume(tokens, OPEN_KEY)) {
                     Arrays.initialize(tokens);

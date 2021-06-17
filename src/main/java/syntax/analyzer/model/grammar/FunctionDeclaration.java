@@ -26,10 +26,10 @@ public class FunctionDeclaration {
     private static Token name;
     private static Token type;
 
-    private static SymTable table;
+    private static SymTable scope;
 
     public static void fullChecker(Deque<Token> tokens) throws SyntaxErrorException, EOFNotExpectedException {
-        table = new SymTable();
+        scope = new SymTable();
         List<Entry<Token, Token>> arguments = new LinkedList();
 
         TokenUtil.consumer(tokens);
@@ -50,7 +50,7 @@ public class FunctionDeclaration {
             TokenUtil.consumeExpectedTokenByLexame(tokens, CLOSE_PARENTHESES);
         }
 
-        table = ProcedureDeclaration.loadArguments(arguments, table);
+        scope = ProcedureDeclaration.loadArguments(arguments, scope);
         IdentifierWithArguments function = new Function(name, type, arguments);
         try {
             Program.GLOBAL_SCOPE.insert(function, name);
@@ -58,7 +58,7 @@ public class FunctionDeclaration {
             ErrorManager.addNewSemanticalError(e);
         }
 
-        StatementDeclaration.fullChecker(tokens, table);
+        StatementDeclaration.fullChecker(tokens, scope);
     }
 
     public static void returnChecker(Deque<Token> tokens) throws EOFNotExpectedException {
@@ -88,7 +88,7 @@ public class FunctionDeclaration {
                     && nextToken.thisLexameIs(SEMICOLON.getVALUE())) {
                 TypeDeclaration.primaryConsumer(tokens);
             } else {
-                Expressions.fullChecker(tokens);
+                Expressions.fullChecker(tokens, scope);
             }
         } catch (SyntaxErrorException e) {
             ErrorManager.addNewSyntaticalError(tokens,
