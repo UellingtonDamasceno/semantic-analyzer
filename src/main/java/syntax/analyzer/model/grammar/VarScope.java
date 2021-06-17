@@ -33,7 +33,6 @@ public class VarScope {
     public static void scopeModifierConsumer(Deque<Token> tokens) throws EOFNotExpectedException, SyntaxErrorException {
         try {
             TokenUtil.consumerByLexame(tokens, GLOBAL);
-            parentScope = Program.GLOBAL_SCOPE;
         } catch (SyntaxErrorException e) {
             try {
                 TokenUtil.consumerByLexame(tokens, LOCAL);
@@ -45,7 +44,7 @@ public class VarScope {
 
     public static Token typedVariableScoped(Deque<Token> tokens) throws EOFNotExpectedException, SyntaxErrorException {
         VarScope.scopeModifierConsumer(tokens);
-        TokenUtil.consumeExpectedTokenByLexame(tokens, DOT);
+        TokenUtil.consumerByLexame(tokens, DOT);
         Token id = tokens.peek();
         TokenUtil.consumerByType(tokens, TokenType.IDENTIFIER, Terminals.IDENTIFIER);
         return id;
@@ -88,8 +87,8 @@ public class VarScope {
                         exx.setInfo(id);
                         ErrorManager.addNewSemanticalError(exx);
                     }
-
                     if (TokenUtil.testLexameBeforeConsume(tokens, OPEN_BRACKET)) {
+                        System.out.println("Entrou aqui00");
                         Arrays.dimensionConsumer(tokens);
                     }
                 } catch (SyntaxErrorException ex) {
@@ -101,6 +100,7 @@ public class VarScope {
                     }
                     TokenUtil.consumerByType(tokens, TokenType.IDENTIFIER, Terminals.IDENTIFIER);
                     if (TokenUtil.testLexameBeforeConsume(tokens, OPEN_BRACKET)) {
+                        System.out.println("Entrou aqui01");
                         Arrays.dimensionConsumer(tokens);
                     }
                 }

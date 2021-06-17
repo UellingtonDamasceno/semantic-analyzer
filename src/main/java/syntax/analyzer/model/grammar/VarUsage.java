@@ -48,6 +48,7 @@ public class VarUsage {
                 ex.setInfo(id);
                 ErrorManager.addNewSemanticalError(ex);
             }
+            Arrays.dimensionConsumer(tokens);
             allProductionsWithBracket(tokens);
         } else {
             throw new SyntaxErrorException(tokens.peek().getLexame(), EQUALS, DOT, OPEN_BRACKET);
@@ -59,9 +60,8 @@ public class VarUsage {
             TokenUtil.consumerByLexame(tokens, EQUALS);
             try {
                 Token id = VarScope.typedVariableScoped(tokens);
-                ComplexIdentifier found = null;
                 try {
-                    found = (ComplexIdentifier) parentScope.find(id);
+                    parentScope.find(id);
                 } catch (UndeclaredSymbolException ex) {
                     ex.setInfo(id);
                     ErrorManager.addNewSemanticalError(ex);
@@ -102,15 +102,16 @@ public class VarUsage {
     }
 
     private static void allProductionsWithBracket(Deque<Token> tokens) throws EOFNotExpectedException, SyntaxErrorException {
-        Arrays.dimensionConsumer(tokens);
         try {
             TokenUtil.consumerByLexame(tokens, SEMICOLON);
         } catch (SyntaxErrorException e) {
             TokenUtil.consumeExpectedTokenByLexame(tokens, EQUALS);
             try {
-                VarScope.typedVariableScoped(tokens);
+                Token id = VarScope.typedVariableScoped(tokens);
                 if (TokenUtil.testLexameBeforeConsume(tokens, DOT)) {
                     StructDeclaration.structUsageConsumer(tokens, parentScope);
+                } else if (TokenUtil.testLexameBeforeConsume(tokens, OPEN_BRACKET)) {
+                    Arrays.dimensionConsumer(tokens);
                 }
             } catch (SyntaxErrorException e1) {
                 EOFNotExpectedException.throwIfEmpty(tokens, IDENTIFIER);

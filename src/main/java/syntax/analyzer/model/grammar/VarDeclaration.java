@@ -120,7 +120,7 @@ public class VarDeclaration {
                 tokens.push(token);
                 if (token.thisLexameIs(GLOBAL.getVALUE())
                         || token.thisLexameIs(LOCAL.getVALUE())) {
-                    Token id = VarScope.typedVariableScoped(tokens);
+                    VarScope.typedVariableScoped(tokens);
                 } else if (nextToken.thisLexameIs(DOT.getVALUE())) {
                     TokenUtil.consumer(tokens);
                     try {

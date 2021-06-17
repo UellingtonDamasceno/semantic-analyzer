@@ -5,9 +5,12 @@ import java.util.LinkedList;
 import java.util.List;
 import static java.util.stream.Collectors.toList;
 import lexical.analyzer.model.Token;
+import semantic.analyzer.model.SymTable;
 import syntax.analyzer.model.SyntaticalError;
 import syntax.analyzer.model.exceptions.EOFNotExpectedException;
 import syntax.analyzer.model.exceptions.SyntaxErrorException;
+import syntax.analyzer.model.grammar.ProcedureMain;
+import syntax.analyzer.model.grammar.Program;
 import syntax.analyzer.model.grammar.StatementDeclaration;
 import syntax.analyzer.model.grammar.VarDeclaration;
 import static syntax.analyzer.util.Terminals.*;
@@ -102,6 +105,9 @@ public class ErrorManager {
         syntaticalErrors.clear();
         E = null;
         unexpectedToken.clear();
+        semanticalErrors.clear();
+        ProcedureMain.MAIN_SCOPE = null;
+        Program.GLOBAL_SCOPE = new SymTable();
     }
 
     public static void addNewSemanticalError(Exception e) {
