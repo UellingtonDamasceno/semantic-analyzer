@@ -19,21 +19,22 @@ public class StatementDeclaration {
 
     private static SymTable scope;
 
-    public static void fullChecker(Deque<Token> tokens, SymTable parent) throws EOFNotExpectedException {
+    public static void fullChecker(Deque<Token> tokens, SymTable parent, String type) throws EOFNotExpectedException {
+
         StatementDeclaration.scope = parent;
         TokenUtil.consumeExpectedTokenByLexame(tokens, OPEN_KEY);
-        statementListChecker(tokens);
+        statementListChecker(tokens, type);
         TokenUtil.consumeExpectedTokenByLexame(tokens, CLOSE_KEY);
     }
 
-    public static void statementListChecker(Deque<Token> tokens) throws EOFNotExpectedException {
-        simpleStatement(tokens);
+    public static void statementListChecker(Deque<Token> tokens, String type) throws EOFNotExpectedException {
+        simpleStatement(tokens, type);
         if (!tokens.isEmpty() && !tokens.peek().thisLexameIs(CLOSE_KEY.getVALUE())) {
-            statementListChecker(tokens);
+            statementListChecker(tokens, type);
         }
     }
 
-    private static void simpleStatement(Deque<Token> tokens) throws EOFNotExpectedException {
+    private static void simpleStatement(Deque<Token> tokens, String type) throws EOFNotExpectedException {
         if (tokens.isEmpty()) {
             throw new EOFNotExpectedException(
                     READ,
@@ -59,11 +60,11 @@ public class StatementDeclaration {
             } else if (token.thisLexameIs(CONST.getVALUE())) {
                 ConstDeclaration.fullChecker(tokens, scope);
             } else if (token.thisLexameIs(RETURN.getVALUE())) {
-                FunctionDeclaration.returnChecker(tokens, scope);
+                FunctionDeclaration.returnChecker(tokens, scope, type);
             } else if (token.thisLexameIs(IF.getVALUE())) {
-                IfElse.fullChecker(tokens, scope);
+                IfElse.fullChecker(tokens, scope, type);
             } else if (token.thisLexameIs(WHILE.getVALUE())) {
-                WhileDeclaration.fullChecker(tokens, scope);
+                WhileDeclaration.fullChecker(tokens, scope, type);
             } else if (token.thisLexameIs(TYPEDEF.getVALUE())) {
                 StructDeclaration.fullChecker(tokens);
             } else if (token.thisLexameIs(GLOBAL.getVALUE()) || token.thisLexameIs(LOCAL.getVALUE())) {

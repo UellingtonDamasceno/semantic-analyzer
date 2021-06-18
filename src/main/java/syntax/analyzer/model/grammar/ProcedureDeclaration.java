@@ -5,8 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import lexical.analyzer.enums.TokenType;
 import lexical.analyzer.model.Token;
 import semantic.analyzer.model.Identifiers.IdentifierWithArguments;
@@ -51,7 +49,7 @@ public class ProcedureDeclaration {
         } catch (SymbolAlreadyDeclaredException ex) {
             ErrorManager.addNewSemanticalError(ex);
         }
-        StatementDeclaration.fullChecker(tokens, table);
+        StatementDeclaration.fullChecker(tokens, table, "void");
     }
 
     public static SymTable loadArguments(List<Entry<Token, Token>> arguments, SymTable table) {

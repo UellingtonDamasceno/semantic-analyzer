@@ -30,7 +30,7 @@ public class ProcedureMain {
             ErrorManager.CAN_ADD = false;
         }
         TokenUtil.consumer(tokens);
-        StatementDeclaration.fullChecker(tokens, MAIN_SCOPE != null ? MAIN_SCOPE : new SymTable());
+        StatementDeclaration.fullChecker(tokens, MAIN_SCOPE != null ? MAIN_SCOPE : new SymTable(), "void");
         ErrorManager.CAN_ADD = true;
     }
 }

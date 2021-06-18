@@ -60,7 +60,7 @@ public class Program {
                     ProcedureDeclaration.fullChecker(tokens);
                 }
             } else if (token.thisLexameIs(OPEN_KEY.getVALUE())) {
-                ErrorManager.genericBlockConsumer(tokens);
+                ErrorManager.genericBlockConsumer(tokens, "void");
             } else if (token.getType() == TokenType.IDENTIFIER
                     || TypeDeclaration.typeChecker(token)) {
                 Signature.fullChecker(tokens);

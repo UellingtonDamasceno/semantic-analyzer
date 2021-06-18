@@ -15,8 +15,10 @@ import syntax.analyzer.util.TokenUtil;
 public class IfElse {
 
     private static SymTable scope;
-
-    public static void fullChecker(Deque<Token> tokens, SymTable parent) throws EOFNotExpectedException, SyntaxErrorException {
+    private static String type;
+    
+    public static void fullChecker(Deque<Token> tokens, SymTable parent, String type) throws EOFNotExpectedException, SyntaxErrorException {
+        IfElse.type = type;
         IfElse.scope = parent;
         ifConsumer(tokens);
         elseConsumer(tokens);
@@ -26,13 +28,13 @@ public class IfElse {
         TokenUtil.consumer(tokens);
         Expressions.fullChecker(tokens, scope);
         TokenUtil.consumeExpectedTokenByLexame(tokens, THEN);
-        StatementDeclaration.fullChecker(tokens, new SymTable(scope));
+        StatementDeclaration.fullChecker(tokens, new SymTable(scope), type);
     }
 
     public static void elseConsumer(Deque<Token> tokens) throws EOFNotExpectedException {
         if (TokenUtil.testLexameBeforeConsume(tokens, ELSE)) {
             TokenUtil.consumer(tokens);
-            StatementDeclaration.fullChecker(tokens, new SymTable(scope));
+            StatementDeclaration.fullChecker(tokens, new SymTable(scope), type);
         }
     }
 }

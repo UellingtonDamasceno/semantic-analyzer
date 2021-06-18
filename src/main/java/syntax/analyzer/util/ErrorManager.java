@@ -27,7 +27,7 @@ public class ErrorManager {
     private static EOFNotExpectedException E;
     public static boolean CAN_ADD = true;
 
-    public static void genericBlockConsumer(Deque<Token> tokens) throws EOFNotExpectedException {
+    public static void genericBlockConsumer(Deque<Token> tokens, String type) throws EOFNotExpectedException {
         TokenUtil.consumer(tokens);
         try {
             VarDeclaration.typedVariableConsumer(tokens);
@@ -39,7 +39,7 @@ public class ErrorManager {
                 findNext(tokens, CLOSE_KEY);
                 TokenUtil.consumer(tokens);
             } catch (SyntaxErrorException e1) {
-                StatementDeclaration.statementListChecker(tokens);
+                StatementDeclaration.statementListChecker(tokens, type);
                 findNext(tokens, CLOSE_KEY);
                 TokenUtil.consumer(tokens);
             }
