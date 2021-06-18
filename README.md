@@ -63,7 +63,12 @@ procedure start {
   print("HELLO WORLD!");
 } 
  ```
+
+## Saída
  
+ Será gerado um conjunto de arquivos de saída, denomidado saidaX.txt, onde X é um
+ valor numérico, referente ao arquivo de entrada que ele representa.
+
  ### Extras
  
  Para facilitar a vida do desenvolvedor, alteramos a gramática para permitir que o analisador sintático compreendesse ou permitisse
@@ -80,12 +85,6 @@ procedure start {
 
 Graças à essa decisão, não é necessário declarar funções exatamente em cima da `procedure start` e evita de causar erros semânticos
 por não encontrar uma variável declarada.
-
-## Saída
- 
- Será gerado um conjunto de arquivos de saída, denomidado saidaX.txt, onde X é um
- valor numérico, referente ao arquivo de entrada que ele representa.
-
  
  
  
