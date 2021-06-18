@@ -175,7 +175,7 @@ public class FunctionDeclaration {
                 ErrorManager.addNewSemanticalError(ex1);
             }
         }
-        return null;
+        return new Procedure("procedure", List.of());
     }
 
     public static void argsListConsumer(Deque<Token> tokens, List<String> arguments, SymTable currentScope) throws SyntaxErrorException, EOFNotExpectedException {

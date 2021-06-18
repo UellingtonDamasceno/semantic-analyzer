@@ -1,0 +1,42 @@
+/*
+	Duplicidade de funções e procedimento.
+*/
+
+function int sum(int a, int b){
+	return a+b;
+}
+
+function int sum(int x, int y){ //Erro: Já foi declarada previamente
+	return x+y;
+}
+
+function int sum(int a, int b, int c){
+	return a + b + c;
+}
+
+function real sum(int q, int x){ //Erro: Pois o compilador não tem como inferir qual função sum que possui dois argumentos ele deve invocar.
+	return 0.0;
+}
+
+
+function real sum(real a, real b){ //Não há erros aqui. Pois os tipos dos argumentos são diferentes.
+	return a + b;
+}
+
+
+procedure sum(int a, int b){ //Erro: já foi declarado
+	print(a, b);
+}
+
+procedure sum(int a, int b, int result){
+	result = a + b;
+}
+
+procedure start{
+	sum(1, 2);
+}
+
+procedure start{ // Erro: Como só pode existir um procedure start descartamos toda a analise desse bloco de código. Mas exibimos um erro na saída.
+	sum(1, 2);//Toda a analise do bloco é disconsiderada.
+}
+

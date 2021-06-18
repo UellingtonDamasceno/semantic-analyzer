@@ -1,0 +1,14 @@
+/*
+	Duplicidade de identificadores locais
+*/
+
+procedure start{
+	var{
+		int a, b, c;
+		string a; //Erro: já foi declarado.
+	}
+	var{
+		string b; // Erro: já foi declarado.
+		string c; // Erro: já foi declarado.
+	}
+}

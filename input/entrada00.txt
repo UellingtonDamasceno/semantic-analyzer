@@ -1,0 +1,22 @@
+/*
+	Duplicidade de identificadores globais
+*/
+
+var{
+	int a, b, c;
+
+	string a; // Erro: Já declarado
+	boolean b; // Erro: já declarado
+	real c; // Erro: já declarado
+}
+
+const{
+	int a, b, c; // Erro: já declarado
+	string a, b, c; // Erro: já declarado
+}
+
+procedure start{
+	var{
+		int a, b, c; // Pode ser declarado pois pode-se distinguir uma da outra usando o modificador de acesso "global" ou "local".
+	}
+}

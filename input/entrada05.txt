@@ -1,0 +1,37 @@
+/*
+	Chamada de funções e procedimento;
+*/
+
+
+function int sum(int a, int b){
+	return a + b;
+}
+
+
+procedure myPrint(string message){
+	print(message);
+}
+
+procedure start{
+
+	var{
+		int myIntA, myIntB;
+		string myString1, myString2;
+	}
+
+	sum(myIntA, myIntB);
+	sum(myString1, myString2); //Erro: tipos incompativeis na chamada
+	
+	myPrint(myString1);
+	myPrint(myIntA); // Erro: tipos imcompativeis na chamada.
+
+	myPrint(varQueNaoExiste);// Erro: argumento não existe logo não temos como inferir o tipo e chamar a função correta.
+	sum(numParamErrado); //Erro: Numero de argumentos errado, logo não será possivel encontrar uma identificador com aquele número de argumentos.
+	
+
+	sum("1", false); // Erro: argumentos invalidos
+	myPrint(false); // Erro: argumento invalido
+	myPrint(true); // Erro: argumento invalido
+	myPrint(10.0); // Erro: argumento invalido
+}
+

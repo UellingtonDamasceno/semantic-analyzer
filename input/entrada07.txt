@@ -1,0 +1,63 @@
+typedef struct{
+	const{
+		boolean respira = true;
+	}
+}SerVivo;
+
+typedef struct extends SerVivo{
+	var{
+		int qtdPelos;
+	}
+	const{
+		boolean mama = true;
+	}
+}Mamifero;
+
+
+typedef struct extends Mamifero{
+	var{
+		string name;
+		string idade;
+	}
+} Pessoa;
+
+typedef struct extends Pessoa{
+	var{
+		string matricula;
+	}
+	const{
+		boolean desiste = false;
+	}
+}Aluno;
+
+
+procedure start{
+	print(SerVivo.respira);
+	print(Mamifero.respira);
+	print(Mamifero.qtdPelos);
+	print(Pessoa.respira);
+	print(Pessoa.qtdPelos);
+	print(Pessoa.name);
+	print(Pessoa.idade);
+	print(Pessoa.mama);
+	print(Aluno.respira);
+	print(Aluno.qtdPelos);
+	print(Aluno.name);
+	print(Aluno.idade);
+	print(Aluno.matricula);
+	print(Aluno.desiste);
+
+	Aluno.respira = false; // Erro: respira é constante em serVivo e aluno herda de ser vivo
+	Pessoa.mama = false; //Erro: mama é uma constante de mamifero.
+	Aluno.mama = false; // Erro: mama é uma costante de mamifero e aluno herda de pessoa e mamifero.
+	Aluno.desiste = true; // Erro: O aluno nunca desiste!
+	Aluno.idade = 10.5; // Erro: Erro de cast;
+
+	Aluno.name = "Joãozinho";
+	Aluno.idade = 10;
+	Aluno.matricula = "0123456";
+	Aluno.qtdPelos = 0;
+	
+	Mamifero.name = "Humano"; //Erro: Mamifero não possui um campo nome
+	Pessoa.matricula = "123"; //Erro: Pessoa não possui matricula
+}

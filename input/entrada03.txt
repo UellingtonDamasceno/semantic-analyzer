@@ -1,0 +1,61 @@
+procedure anotherPrint(string message){
+	myPrint(message); // Erro: myPrint ainda não foi declarado
+}
+
+
+function int mult(int a, int b, int c);
+	result = a * b * c; // Erro: result não declarado
+	
+	var{
+		int result = a * b * c;
+	}
+
+	return result;
+}
+
+function int sumAndMult(int a, int b){
+	var{
+        int result = mult(a, a, b);
+    }
+
+    return result;
+}
+
+
+procedure myPrint(string message){
+	print(message);
+	print(aMessage); //Erro: aMessage não declarado
+
+	var{
+		string aMessage;
+	}
+	print(aMessage);//Não dará erro. Pois já foi declarado
+}
+
+
+
+procedure start{
+	var {
+		int a;
+		string b;
+		boolean c;
+		real d;
+	}
+
+	print(a);
+	print(b);
+	print(c);
+	print(d);
+
+	print(x);//Erro: Não declarada
+	
+	while(y < z){ // Erro: y e z não declarado
+		read(m); // Erro: m não declarado
+		if(a > r == b){ // Erro: r não declarado. 
+			print(w); //Erro: w não declarado.
+		}
+	}
+
+	Pessoa.nome = "Meu nome"; Erro: Pessoa e nome não foi declarado.
+	sum(a, b); // Erro: sum não declarado.
+}

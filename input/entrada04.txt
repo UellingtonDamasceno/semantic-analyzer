@@ -1,0 +1,53 @@
+/*
+	Atribuição à constantes e uso de local e global;
+*/
+
+const{
+	int myConstGlobal = 10;
+	string myConstGlobalB = "10";
+	boolean True = true;
+	real PI = 3.14;
+}
+
+var{
+	int a, b, c;
+}
+
+
+
+procedure start{
+	const{
+		int myConstLocal = 10;
+		string myConstLocal = "uma string";
+		boolean False = false;
+		real anotherPI = 3.0;
+	}
+
+	global.myConstGlobal = 10; // Erro: Atribuição a constante;
+	global.myConstGlobalB = "10"; // Erro: Atribuição a constante; 
+	global.True = false; //Erro: Atribuição a constante;
+	global.PI = 5; //Erro: Atribuição a constante;
+
+	
+	local.myConstLocal = 10; //Erro: Atribuição a constante;
+	local.myConstLocal = "10"; // Erro
+	local.False = false; // Erro
+	local.anotherPI = 3.0; // Erro
+
+
+	var{
+		int a, b, c;
+	}
+
+	a = 10;
+	b = 10;
+	c = 10;
+
+	local.a = 11;
+	local.b = 12;
+	local.c = 13;
+
+	global.a = 14;
+	global.b = 15;
+	global.c = 16;
+}	

@@ -1,0 +1,93 @@
+/*
+	Verificações de tipos
+*/
+
+
+const{
+	int SIZE = "Uma string"; // Erro
+	real WIDTH = 10; // Erro: Como cast não é permitido então int não pode ser convertido para real
+	string NAME = 3.14; // Erro: real não pode ser convertido para string
+	boolean IS_TRUE = 0; // Erro: int não pode ser convertido para boolean
+}
+
+
+var{
+	int old = true; // Erro: boolean não pode ser convertido para int
+	real height = "olá"; // Erro: string não pode ser convertida para real;
+	string xMan = 3.5; // Erro: real não pode ser convertido para string;
+	boolean isFalse = 5; // int não pose ser coonvertido para boolean
+}
+
+
+const{
+	int MY_OLD = 100;
+	string NAME = "PBL";
+	real PI = 3.14;
+	boolean IS_FALSE = true;
+}
+
+var{
+	int a = 10;
+	string b = "aasfda";
+	real c = 3.14;
+	boolean d = false;
+}
+
+
+function int sum(int a, int b){
+	return "result"; // Erro: pois o tipo de retorno é diferente;
+}
+
+function int mult(int a, int b){
+	return a * b;
+}
+
+function string getString(){
+	return "NAME";
+}
+
+function boolean getBoolean(){
+	return false;
+}
+
+function real getReal(){
+	return 3.14;
+}
+
+function int getInt(){
+	return 0;
+}
+
+function string getString(string myString){
+	return myString;
+}
+
+function boolean getBoolean(boolean myBoolean){
+	return myBoolean;
+}
+
+function real getReal(real myReal){
+	return myReal;
+}
+
+function int getInt(int myInt){
+	return myInt;
+}
+
+procedure start{
+	var{
+		string name = getString();
+		int myInt = getInt();
+		boolean myBoolean = getBoolean();
+		real myReal = getReal();
+	}
+
+	name = getInt(); //Erro
+	myInt = getString(); //Erro
+	myBoolean = getReal(); // Erro
+	myReal = getBoolean(); // Erro
+
+	sum(getInt(), getInt());
+	sum(getString(), getBoolean()); // Erro: sum recebe int e int, mas está sendo passado string e boolean
+
+}
