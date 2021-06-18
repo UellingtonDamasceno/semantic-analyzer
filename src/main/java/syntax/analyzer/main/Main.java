@@ -25,7 +25,7 @@ public class Main {
     public static void main(String[] args) {
         boolean showLexicalToken = Arrays.asList(args).contains("-l");
         boolean showUnexpectedToken = Arrays.asList(args).contains("-c");
-        boolean showSemanticalErrors = Arrays.asList(args).contains("-s");
+        boolean showSyntaticalErrors = Arrays.asList(args).contains("-s");
 
         FilesUtil.createIfNotExists("./output");
         Pattern pattern = Pattern.compile(FilesUtil.regexInputFileFilter);
@@ -50,7 +50,7 @@ public class Main {
                                     .map(Token::toString)
                                     .collect(toList());
                         }
-                        lines.addAll(ErrorManager.getErrors(showUnexpectedToken, showSemanticalErrors));
+                        lines.addAll(ErrorManager.getErrors(showUnexpectedToken, showSyntaticalErrors));
                         FilesUtil.write(path, lines);
                         ErrorManager.clear();
                     });
