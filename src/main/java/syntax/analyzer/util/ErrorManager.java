@@ -93,7 +93,7 @@ public class ErrorManager {
             lines.add(E.getMessage());
         }
         return lines.isEmpty()
-                ? List.of("NÃO FORAM ENCONTRADOS ERROS SINTATICOS!")
+                ? List.of("O CÓDIGO FOI ANALISADO COM SUCESSO!")
                 : lines;
     }
 
