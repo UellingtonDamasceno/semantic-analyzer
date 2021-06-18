@@ -86,18 +86,6 @@ por não encontrar uma variável declarada.
  Será gerado um conjunto de arquivos de saída, denomidado saidaX.txt, onde X é um
  valor numérico, referente ao arquivo de entrada que ele representa.
 
-### Exemplo de saída
- 
- Utilizando o exemplo de entrada utilizado na sessão anterior obteremos a seguite
- saida caso não seja utilizado a flag `-l`:
- 
-    `NÃO FORAM ENCONTRADOS ERROS SINTÁTICOS!`.
- 
- Ao remover último `}` do exemplo apresentado anteriormente obteremos o seguinte 
- resultado caso não seja utilizado a flag `-l`:
- 
-    `O arquivo terminou inesperadamente! O analisador esperava um: "}"` 
- 
  
  
  
